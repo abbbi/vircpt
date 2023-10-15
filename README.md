@@ -70,18 +70,26 @@ INFO lib common - printVersion: Version: 0.1 Arguments: ./vircpt -d vm1 export -
 INFO root vircpt - main: Libvirt library version: [9000000]
 INFO root disktype - Optical: Skipping attached [cdrom] device: [sdb].
 INFO root disktype - Optical: Skipping attached [floppy] device: [fda].
-INFO root vircpt - main: Socket for exported checkpoint: [/var/tmp/vircpt.206438]
+INFO root vircpt - main: Socket for exported checkpoint: [/var/tmp/vircpt.207990]
 INFO root vircpt - main: -----------------------------------
 INFO root vircpt - main: Useful commands:
 INFO root vircpt - main: -----------------------------------
-INFO root vircpt - main: [nbdinfo 'nbd+unix:///?socket=/var/tmp/vircpt.206438' --list]
+INFO root vircpt - main: [nbdinfo 'nbd+unix:///?socket=/var/tmp/vircpt.207990' --list]
 INFO root vircpt - main: Disk: sda
-INFO root vircpt - main:  [qemu-img create -F raw -b nbd+unix:///sda?socket=/var/tmp/vircpt.206438 -f qcow2 /tmp/image_sda.qcow2]
-INFO root vircpt - main:  [qemu-nbd -c /dev/nbd0 /tmp/image_sda.qcow2]
-INFO root vircpt - main:  [qemu-nbd -c /dev/nbd0 'nbd+unix:///sda?socket=/var/tmp/vircpt.206438' -r]
+INFO root vircpt - main:  [qemu-img create -F raw -b nbd+unix:///sda?socket=/var/tmp/vircpt.207990 -f qcow2 /tmp/image_sda.qcow2]
+INFO root vircpt - main:  [qemu-nbd -c /dev/nbd0 /tmp/image_sda.qcow2]  && [virsh attach-disk tgtvm --source /dev/nbd0  --target vdX]
+INFO root vircpt - main:  [qemu-nbd -c /dev/nbd0 'nbd+unix:///sda?socket=/var/tmp/vircpt.207990' -r] && [fdisk -l /dev/nbd0]
 INFO root vircpt - main: -----------------------------------
 INFO root vircpt - main: Finished successfully
 ```
+
+The output will create some useful commands for operating on the created
+NBD socket endpoint, such as:
+
+ * Query info about exported devices
+ * Create an overlay image with NBD socket backend (for direct boot)
+ * Setup and NBD Device for the overlay image, which can then be attached
+ to another virtual machine
 
 This will create an unix socket endpoint which can then be accessed via other
 qemu utilities or mapped to an qcow2 image via backing store option:
