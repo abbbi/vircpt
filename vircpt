@@ -203,9 +203,32 @@ def main() -> None:
             try:
                 checkpoint.export(args, domObj, diskList)
                 logging.info("Socket for exported checkpoint: [%s]", args.socketfile)
+                logging.info("-----------------------------------")
+                logging.info("Useful commands:")
+                logging.info("-----------------------------------")
                 logging.info(
                     "[nbdinfo 'nbd+unix:///?socket=%s' --list]", args.socketfile
                 )
+                cnt = 0
+                for disk in diskList:
+                    logging.info("Disk: %s", disk.target)
+                    logging.info(
+                        " [qemu-img create -F raw -b nbd+unix:///%s?socket=%s -f qcow2 /tmp/image_%s.qcow2]",
+                        disk.target,
+                        args.socketfile,
+                        disk.target,
+                    )
+                    logging.info(
+                        " [qemu-nbd -c /dev/nbd%s /tmp/image_%s.qcow2]", cnt, disk.target
+                    )
+                    logging.info(
+                        " [qemu-nbd -c /dev/nbd%s 'nbd+unix:///%s?socket=%s' -r]",
+                        cnt,
+                        disk.target,
+                        args.socketfile,
+                    )
+                    cnt += 1
+                logging.info("-----------------------------------")
             except libvirtError as e:
                 logging.error("Failed to export checkpoint: [%s]", e)
 

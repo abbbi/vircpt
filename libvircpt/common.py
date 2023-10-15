@@ -23,10 +23,7 @@ from libvircpt.logcount import logCount
 
 log = logging.getLogger("lib")
 
-logFormat = (
-    "%(asctime)s %(levelname)s %(name)s %(module)s - %(funcName)s"
-    " [%(threadName)s]: %(message)s"
-)
+logFormat = "%(asctime)s %(levelname)s %(name)s %(module)s - %(funcName)s: %(message)s"
 logDateFormat = "[%Y-%m-%d %H:%M:%S]"
 
 
