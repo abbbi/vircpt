@@ -17,4 +17,4 @@
  * delete checkpoints
  * list checkpoints
  * export checkpoints via NBD server backend
- * hot-add attach crated NBD exports to other virtual machines
+ * hot-add attach created NBD exports to other virtual machines
