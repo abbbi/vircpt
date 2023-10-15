@@ -213,7 +213,7 @@ def main() -> None:
                 for disk in diskList:
                     logging.info("Disk: %s", disk.target)
                     logging.info(
-                        " [qemu-img create -F raw"
+                        " [qemu-img create -F raw "
                         "-b nbd+unix:///%s?socket=%s -f qcow2 /tmp/image_%s.qcow2]",
                         disk.target,
                         args.socketfile,
