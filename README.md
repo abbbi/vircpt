@@ -17,6 +17,8 @@
 
 # vircpt
 
+Libvirt checkpoint swiss army knife.
+
 # About
 
 `virtcpt` can be used to manage libvirt virtual domain checkpoints, as in:
