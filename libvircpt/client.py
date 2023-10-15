@@ -205,7 +205,7 @@ class client:
             diskFormat = disk.xpath("driver")[0].get("type")
 
             if excludeList is not None and dev in excludeList:
-                log.warning("Excluding disk [%s] from backup as requested", dev)
+                log.warning("Excluding disk [%s] from operation as requested", dev)
                 continue
 
             # skip cdrom/floppy devices
@@ -266,7 +266,7 @@ class client:
             domObj.abortJob()
             return True
         except libvirt.libvirtError as err:
-            log.warning("Failed to stop backup job: [%s]", err)
+            log.warning("Failed to stop block job: [%s]", err)
             return False
 
     @staticmethod

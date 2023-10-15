@@ -55,7 +55,9 @@ def main() -> None:
     )
 
     opt = parser.add_argument_group("General options")
-    opt.add_argument("-d", "--domain", required=True, type=str, help="Domain to backup")
+    opt.add_argument(
+        "-d", "--domain", required=True, type=str, help="Domain to operate on"
+    )
     opt.add_argument(
         "-v",
         "--verbose",
