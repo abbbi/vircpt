@@ -254,9 +254,7 @@ class client:
                 )
                 continue
 
-            devices.append(
-                DomainDisk(dev, diskFormat, diskFileName, diskPath)
-            )
+            devices.append(DomainDisk(dev, diskFormat, diskFileName, diskPath))
 
         log.debug("Device list: %s ", devices)
         return devices
@@ -270,7 +268,6 @@ class client:
         except libvirt.libvirtError as err:
             log.warning("Failed to stop backup job: [%s]", err)
             return False
-
 
     @staticmethod
     def blockJobActive(domObj: libvirt.virDomain, disks: List[DomainDisk]) -> bool:

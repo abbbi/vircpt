@@ -18,8 +18,10 @@ class connectionFailed(virtHelperError):
 class startBackupFailed(virtHelperError):
     """Can't start backup operation"""
 
+
 class NoCheckpointsFound(virtHelperError):
     """foo"""
+
 
 class CheckpointException(Exception):
     """Base checkpoint Exception"""

@@ -18,7 +18,7 @@ import sys
 import logging
 import logging.handlers
 from argparse import Namespace
-from typing import  List, Any
+from typing import List, Any
 from libvircpt.logcount import logCount
 
 log = logging.getLogger("lib")

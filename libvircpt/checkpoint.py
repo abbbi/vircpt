@@ -55,9 +55,8 @@ def delete(cptObj: libvirt.virDomainCheckpoint) -> bool:
         log.error("Error during checkpoint removal: [%s]", errmsg)
         return False
 
-def _createCheckpointXml(
-    diskList: List[Any], checkpointName: str
-) -> str:
+
+def _createCheckpointXml(diskList: List[Any], checkpointName: str) -> str:
     """Create valid checkpoint XML file which is passed to libvirt API"""
     top = ElementTree.Element("domaincheckpoint")
     desc = ElementTree.SubElement(top, "description")
@@ -81,9 +80,11 @@ def _createCheckpointXml(
 
     return xml.indent(top)
 
+
 def create(args: Namespace, domObj: libvirt.virDomain, diskList):
-    """ Create checkpoint """
+    """Create checkpoint"""
     domObj.checkpointCreateXML(_createCheckpointXml(diskList, args.name))
+
 
 def list(domObj: libvirt.virDomain):
     """list checkpoints"""
@@ -95,11 +96,8 @@ def list(domObj: libvirt.virDomain):
 def _createExportXml(args: Namespace, diskList) -> str:
     """Create xml required for exporting checkpoint"""
     top = ElementTree.Element("domainbackup", {"mode": "pull"})
-    inc = ElementTree.SubElement(
-        top, "incremental"
-    )
+    inc = ElementTree.SubElement(top, "incremental")
     inc.text = args.name
-
 
     ElementTree.SubElement(
         top, "server", {"transport": "unix", "socket": f"{args.socketfile}"}
@@ -108,9 +106,7 @@ def _createExportXml(args: Namespace, diskList) -> str:
     disks = ElementTree.SubElement(top, "disks")
 
     for disk in diskList:
-        scratchId = "".join(
-            random.choices(string.ascii_uppercase + string.digits, k=5)
-        )
+        scratchId = "".join(random.choices(string.ascii_uppercase + string.digits, k=5))
         scratchFile = f"{args.scratchdir}/backup.{scratchId}.{disk.target}"
         log.debug("Using scratch file: %s", scratchFile)
         dE = ElementTree.SubElement(disks, "disk", {"name": disk.target})
