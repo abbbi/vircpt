@@ -86,7 +86,7 @@ def create(args: Namespace, domObj: libvirt.virDomain, diskList):
     domObj.checkpointCreateXML(_createCheckpointXml(diskList, args.name))
 
 
-def list(domObj: libvirt.virDomain):
+def show(domObj: libvirt.virDomain):
     """list checkpoints"""
     cpts = domObj.listAllCheckpoints()
     for cpt in cpts:

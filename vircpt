@@ -175,7 +175,7 @@ def main() -> None:
     if args.command == "list":
         logging.info("List of existing checkpoints:")
         try:
-            checkpoint.list(domObj)
+            checkpoint.show(domObj)
         except libvirtError as e:
             logging.error("Failed to list checkpoint: [%s]", e)
 
