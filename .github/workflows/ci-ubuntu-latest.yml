@@ -1,4 +1,4 @@
-name: virtnbdbackup CI on ubuntu-22.04
+name: vircpt codecheck
 
 on: [push, pull_request]
 
