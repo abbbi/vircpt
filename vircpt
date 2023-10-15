@@ -220,15 +220,20 @@ def main() -> None:
                         disk.target,
                     )
                     logging.info(
-                        " [qemu-nbd -c /dev/nbd%s /tmp/image_%s.qcow2]",
+                        " [qemu-nbd -c /dev/nbd%s /tmp/image_%s.qcow2] "
+                        " && [virsh attach-disk tgtvm --source /dev/nbd%s  --target vdX]"
+                        ,
                         cnt,
                         disk.target,
+                        cnt,
                     )
                     logging.info(
-                        " [qemu-nbd -c /dev/nbd%s 'nbd+unix:///%s?socket=%s' -r]",
+                        " [qemu-nbd -c /dev/nbd%s 'nbd+unix:///%s?socket=%s' -r]"
+                        " && [fdisk -l /dev/nbd%s]",
                         cnt,
                         disk.target,
                         args.socketfile,
+                        cnt,
                     )
                     cnt += 1
                 logging.info("-----------------------------------")
