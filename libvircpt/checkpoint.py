@@ -18,16 +18,10 @@ import random
 import string
 import logging
 from argparse import Namespace
-from typing import Optional, Union, Any, List
+from typing import Any, List
 from lxml import etree as ElementTree
 import libvirt
 from libvircpt import xml
-from libvircpt.common import defaultCheckpointName
-from libvircpt.exceptions import (
-    NoCheckpointsFound,
-    CheckpointException,
-    RemoveCheckpointError,
-)
 
 log = logging.getLogger()
 

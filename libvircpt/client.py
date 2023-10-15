@@ -15,22 +15,17 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import os
-import string
-import random
 import logging
 from dataclasses import dataclass
 from socket import gethostname
 from argparse import Namespace
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, List, Tuple, Union
 from lxml.etree import _Element
-from lxml import etree as ElementTree
 import libvirt
 from libvircpt.exceptions import (
     domainNotFound,
     connectionFailed,
-    startBackupFailed,
 )
-from libvircpt import fs
 from libvircpt import xml
 from libvircpt import disktype
 
@@ -265,67 +260,6 @@ class client:
 
         log.debug("Device list: %s ", devices)
         return devices
-
-    def _createBackupXml(self, args: Namespace, diskList) -> str:
-        """Create XML file for starting an backup task using libvirt API."""
-        top = ElementTree.Element("domainbackup", {"mode": "pull"})
-        if self.remoteHost == "":
-            ElementTree.SubElement(
-                top, "server", {"transport": "unix", "socket": f"{args.socketfile}"}
-            )
-        else:
-            listen = self.remoteHost
-            tls = "no"
-            if args.tls:
-                tls = "yes"
-            if args.nbd_ip != "":
-                listen = args.nbd_ip
-            ElementTree.SubElement(
-                top,
-                "server",
-                {"tls": f"{tls}", "name": f"{listen}", "port": f"{args.nbd_port}"},
-            )
-
-        disks = ElementTree.SubElement(top, "disks")
-
-        for disk in diskList:
-            scratchId = "".join(
-                random.choices(string.ascii_uppercase + string.digits, k=5)
-            )
-            scratchFile = f"{args.scratchdir}/backup.{scratchId}.{disk.target}"
-            log.debug("Using scratch file: %s", scratchFile)
-            dE = ElementTree.SubElement(disks, "disk", {"name": disk.target})
-            ElementTree.SubElement(dE, "scratch", {"file": f"{scratchFile}"})
-
-        return xml.indent(top)
-
-    def startExport(
-        self,
-        args: Namespace,
-        domObj: libvirt.virDomain,
-        diskList: List[Any],
-    ) -> None:
-        """Export checkpoint data via NBD"""
-        backupXml = self._createBackupXml(args, diskList)
-        checkpointXml = None
-        freezed = False
-
-        try:
-            log.debug("Starting backup job via libvirt API.")
-            domObj.backupBegin(backupXml, checkpointXml)
-            log.debug("Started backup job via libvirt API.")
-        except libvirt.libvirtError as errmsg:
-            raise startBackupFailed(f"Failed to start backup: [{errmsg}]") from errmsg
-        except Exception as e:
-            log.exception(e)
-            raise startBackupFailed(
-                f"Unknown exception during backup start: [{e}]"
-            ) from e
-        finally:
-            # check if filesystem is freezed and thaw
-            # in case creating checkpoint fails.
-            if freezed is True:
-                fs.thaw(domObj)
 
     @staticmethod
     def stopExport(domObj: libvirt.virDomain) -> bool:

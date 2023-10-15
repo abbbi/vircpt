@@ -18,8 +18,7 @@ import sys
 import logging
 import logging.handlers
 from argparse import Namespace
-from typing import Optional, List, Any
-
+from typing import  List, Any
 from libvircpt.logcount import logCount
 
 log = logging.getLogger("lib")
@@ -29,7 +28,6 @@ logFormat = (
     " [%(threadName)s]: %(message)s"
 )
 logDateFormat = "[%Y-%m-%d %H:%M:%S]"
-defaultCheckpointName = "virtnbdbackup"
 
 
 def argparse(parser) -> Namespace:
@@ -54,10 +52,7 @@ def setLogLevel(verbose: bool) -> int:
 def configLogger(args: Namespace, counter: logCount):
     """Setup logging"""
     handler: List[Any]
-    handler = [
-        counter,
-        logging.StreamHandler(stream=sys.stderr)
-    ]
+    handler = [counter, logging.StreamHandler(stream=sys.stderr)]
     logging.basicConfig(
         level=setLogLevel(args.verbose),
         format=logFormat,
