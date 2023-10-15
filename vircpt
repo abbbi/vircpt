@@ -91,14 +91,7 @@ def main() -> None:
         "--include",
         default=None,
         type=str,
-        help="Backup only disk with target dev name (-i vda)",
-    )
-    opt.add_argument(
-        "-r",
-        "--raw",
-        default=False,
-        action="store_true",
-        help="Include full provisioned disk images in backup. (default: %(default)s)",
+        help="Include only disk with target dev name (-i vda)",
     )
     opt.add_argument(
         "-S",
@@ -108,15 +101,6 @@ def main() -> None:
         type=str,
         help="Target dir for temporary scratch file. (default: %(default)s)",
     )
-    opt.add_argument(
-        "-f",
-        "--socketfile",
-        default=f"/var/tmp/virtnbdbackup.{os.getpid()}",
-        type=str,
-        help="Use specified file for NBD Server socket (default: %(default)s)",
-    )
-
-
 
     sub_parsers = parser.add_subparsers(help="sub-command help", dest="command")
     parser_create = sub_parsers.add_parser("create", help="Create checkpoint")
@@ -138,6 +122,13 @@ def main() -> None:
         default=f"/var/tmp/vircpt.{os.getpid()}",
         type=str,
         help="Use specified file for NBD Server socket (default: %(default)s)",
+    )
+    parser_export.add_argument(
+        "-r",
+        "--raw",
+        default=False,
+        action="store_true",
+        help="Include full provisioned disk images in export. (default: %(default)s)",
     )
     sub_parsers.add_parser("release", help="Stop exporting.")
 
@@ -200,7 +191,6 @@ def main() -> None:
     if args.command == "release":
         if virtClient.blockJobActive(domObj, diskList):
             virtClient.stopExport(domObj)
-
 
     if counter.count.errors > 0:
         logging.error("Error during checkpoint handling")
