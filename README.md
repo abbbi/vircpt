@@ -36,12 +36,12 @@ Create an checkpoint named "foo":
 
 ```
 # vircpt -d vm1 create --name foo
-INFO lib common - printVersion [MainThread]: Version: 0.1 Arguments: ./vircpt -d vm1 create --name foo
-INFO root vircpt - main [MainThread]: Libvirt library version: [9000000]
-INFO root disktype - Optical [MainThread]: Skipping attached [cdrom] device: [sdb].
-INFO root disktype - Optical [MainThread]: Skipping attached [floppy] device: [fda].
-WARNING fs fs - freeze [MainThread]: Guest agent is not responding: QEMU guest agent is not connected
-INFO root vircpt - main [MainThread]: Finished successfully
+INFO lib common - printVersion: Version: 0.1 Arguments: ./vircpt -d vm1 create --name foo
+INFO root vircpt - main: Libvirt library version: [9000000]
+INFO root disktype - Optical: Skipping attached [cdrom] device: [sdb].
+INFO root disktype - Optical: Skipping attached [floppy] device: [fda].
+WARNING fs fs - freeze: Guest agent is not responding: QEMU guest agent is not connected
+INFO root vircpt - main: Finished successfully
 ```
 
 ## List checkpoints
@@ -50,13 +50,13 @@ In order to view existing checkpoints, use:
 
 ```
 # vircpt -d vm1 list
-INFO lib common - printVersion [MainThread]: Version: 0.1 Arguments: ./vircpt -d vm1 list
-INFO root vircpt - main [MainThread]: Libvirt library version: [9000000]
-INFO root disktype - Optical [MainThread]: Skipping attached [cdrom] device: [sdb].
-INFO root disktype - Optical [MainThread]: Skipping attached [floppy] device: [fda].
-INFO root vircpt - main [MainThread]: List of existing checkpoints:
-INFO root checkpoint - show [MainThread]:  + foo
-INFO root vircpt - main [MainThread]: Finished successfully
+INFO lib common - printVersion: Version: 0.1 Arguments: ./vircpt -d vm1 list
+INFO root vircpt - main: Libvirt library version: [9000000]
+INFO root disktype - Optical: Skipping attached [cdrom] device: [sdb].
+INFO root disktype - Optical: Skipping attached [floppy] device: [fda].
+INFO root vircpt - main: List of existing checkpoints:
+INFO root checkpoint - show:  + foo
+INFO root vircpt - main: Finished successfully
 ```
 
 ## Start NBD export for a specific checkpoint
@@ -66,13 +66,21 @@ parameter:
 
 ```
 # vircpt -d vm1 export --name foo
-INFO lib common - printVersion [MainThread]: Version: 0.1 Arguments: ./vircpt -d vm1 export --name foo
-INFO root vircpt - main [MainThread]: Libvirt library version: [9000000]
-INFO root disktype - Optical [MainThread]: Skipping attached [cdrom] device: [sdb].
-INFO root disktype - Optical [MainThread]: Skipping attached [floppy] device: [fda].
-INFO root vircpt - main [MainThread]: Socket for exported checkpoint: [/var/tmp/vircpt.199988]
-INFO root vircpt - main [MainThread]: [nbdinfo 'nbd+unix:///?socket=/var/tmp/vircpt.199988' --list]
-INFO root vircpt - main [MainThread]: Finished successfully
+INFO lib common - printVersion: Version: 0.1 Arguments: ./vircpt -d vm1 export --name export
+INFO root vircpt - main: Libvirt library version: [9000000]
+INFO root disktype - Optical: Skipping attached [cdrom] device: [sdb].
+INFO root disktype - Optical: Skipping attached [floppy] device: [fda].
+INFO root vircpt - main: Socket for exported checkpoint: [/var/tmp/vircpt.206438]
+INFO root vircpt - main: -----------------------------------
+INFO root vircpt - main: Useful commands:
+INFO root vircpt - main: -----------------------------------
+INFO root vircpt - main: [nbdinfo 'nbd+unix:///?socket=/var/tmp/vircpt.206438' --list]
+INFO root vircpt - main: Disk: sda
+INFO root vircpt - main:  [qemu-img create -F raw -b nbd+unix:///sda?socket=/var/tmp/vircpt.206438 -f qcow2 /tmp/image_sda.qcow2]
+INFO root vircpt - main:  [qemu-nbd -c /dev/nbd0 /tmp/image_sda.qcow2]
+INFO root vircpt - main:  [qemu-nbd -c /dev/nbd0 'nbd+unix:///sda?socket=/var/tmp/vircpt.206438' -r]
+INFO root vircpt - main: -----------------------------------
+INFO root vircpt - main: Finished successfully
 ```
 
 This will create an unix socket endpoint which can then be accessed via other
