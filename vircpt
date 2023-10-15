@@ -167,6 +167,7 @@ def main() -> None:
     vmConfig = virtClient.getDomainConfig(domObj)
     diskList = virtClient.getDomainDisks(args, vmConfig)
 
+    freezed = False
     if args.command == "create":
         try:
             freezed = fs.freeze(domObj)

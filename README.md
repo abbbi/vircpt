@@ -11,6 +11,7 @@
   - [Release an export](#release-an-export)
   - [Removing checkpoints](#removing-checkpoints)
 - [Filesystem Consistency](#filesystem-consistency)
+- [Requirements](#requirements)
 - [TODO / Ideas](#todo--ideas)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -127,6 +128,11 @@ Remove checkpoints via:
 If reachable, `vircpt` will attempt to freeze the domains file systems
 via Qemu agent.
 
+# Requirements
+
+ * libvirt / qemu versions with checkpoint support
+ * virtual machine must have qcow v3 versioned images with persistent bitmap
+   support.
 
 # TODO / Ideas
 
