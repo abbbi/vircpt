@@ -1,0 +1,25 @@
+name: virtnbdbackup CI on ubuntu-22.04
+
+on: [push, pull_request]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: abbbi/github-actions-tune@v1
+    - name: codespell
+      run: |
+        sudo apt-get update
+        sudo apt-get install codespell -y
+        codespell .
+    - name: Python code format test
+      run: |
+        sudo pip3 install black==22.3
+        black --check .
+    - name: Python lint test
+      run: |
+        sudo pip3 install pylint==2.14.5
+        pylint .
