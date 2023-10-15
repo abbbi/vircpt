@@ -38,7 +38,19 @@ def main() -> None:
     """main"""
     parser = argparse.ArgumentParser(
         description="Libvirt checkpoint swiss army knife",
-        epilog=("foo"),
+        epilog=(
+            "Examples:\n"
+            "   # create an checkpoint:\n"
+            "\t%(prog)s -d vm create --name mycpt\n"
+            "   # delete an checkpoint:\n"
+            "\t%(prog)s -d vm delete --name mycpt\n"
+            "   # list existing checkpoints:\n"
+            "\t%(prog)s -d vm list\n"
+            "   # export checkpoint via NBD accessible via unix socket:\n"
+            "\t%(prog)s -d vm export --name mycpt\n"
+            "   # release export:\n"
+            "\t%(prog)s -d vm release\n"
+        ),
         formatter_class=argparse.RawTextHelpFormatter,
     )
 
