@@ -66,7 +66,7 @@ parameter:
 
 ```
 # vircpt -d vm1 export --name foo
-INFO lib common - printVersion: Version: 0.1 Arguments: ./vircpt -d vm1 export --name export
+INFO lib common - printVersion: Version: 0.1 Arguments: ./vircpt -d vm1 export --name foo
 INFO root vircpt - main: Libvirt library version: [9000000]
 INFO root disktype - Optical: Skipping attached [cdrom] device: [sdb].
 INFO root disktype - Optical: Skipping attached [floppy] device: [fda].
@@ -86,20 +86,19 @@ INFO root vircpt - main: Finished successfully
 The output will create some useful commands for operating on the created
 NBD socket endpoint, such as:
 
- * Query info about exported devices
+ * Query info about exported devices using nbdinfo.
  * Create an overlay image with NBD socket backend (for direct boot)
  * Setup and NBD Device for the overlay image, which can then be attached
  to another virtual machine
 
-This will create an unix socket endpoint which can then be accessed via other
-qemu utilities or mapped to an qcow2 image via backing store option:
+nbdinfo example:
 
 ```
-# nbdinfo 'nbd+unix:///?socket=/var/tmp/vircpt.199988' --list
+# nbdinfo 'nbd+unix:///?socket=/var/tmp/vircpt.207990' --list
 protocol: newstyle-fixed without TLS, using structured packets
 export="sda":
         export-size: 52428800 (50M)
-        uri: nbd+unix:///sda?socket=/var/tmp/vircpt.199988
+        uri: nbd+unix:///sda?socket=/var/tmp/vircpt.207990
         contexts:
                 base:allocation
                 qemu:dirty-bitmap:backup-sda
