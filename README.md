@@ -135,8 +135,8 @@ Remove checkpoints via:
 
 # Filesystem Consistency
 
-If reachable, `vircpt` will attempt to freeze the domains file systems
-via Qemu agent.
+If reachable, `vircpt` will attempt to freeze the domains file systems via Qemu
+agent during checkpoint creation for file system consistency.
 
 
 # Use Cases
