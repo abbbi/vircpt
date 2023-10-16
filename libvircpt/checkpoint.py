@@ -109,7 +109,9 @@ def _createExportXml(args: Namespace, diskList) -> str:
         scratchId = "".join(random.choices(string.ascii_uppercase + string.digits, k=5))
         scratchFile = f"{args.scratchdir}/backup.{scratchId}.{disk.target}"
         log.debug("Using scratch file: %s", scratchFile)
-        dE = ElementTree.SubElement(disks, "disk", {"name": disk.target})
+        dE = ElementTree.SubElement(
+            disks, "disk", {"name": disk.target, "exportbitmap": args.name}
+        )
         ElementTree.SubElement(dE, "scratch", {"file": f"{scratchFile}"})
 
     return xml.indent(top)
