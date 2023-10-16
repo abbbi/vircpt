@@ -24,3 +24,7 @@ jobs:
         sudo pip3 install pylint==2.14.5
         pylint vircpt
         pylint libvircpt
+    - name: Installtest
+      run: |
+        sudo python3 setup.py install
+        vircpt -h
