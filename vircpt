@@ -53,7 +53,7 @@ def showcmd(args, diskList):
         )
         logging.info(
             " [qemu-nbd -c /dev/nbd%s /tmp/image_%s.qcow2] "
-            " && [virsh attach-disk tgtvm --source /dev/nbd%s  --target vdX]",
+            " && [virsh attach-disk tgtvm --source /dev/nbd%s --target vdX]",
             cnt,
             disk.target,
             cnt,
@@ -65,6 +65,12 @@ def showcmd(args, diskList):
             disk.target,
             args.socketfile,
             cnt,
+        )
+        logging.info(
+            " [nbdcopy 'nbd+unix:///%s?socket=%s' -p backup-%s.img]",
+            disk.target,
+            args.socketfile,
+            disk.target,
         )
         cnt += 1
     logging.info("-----------------------------------")

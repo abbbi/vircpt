@@ -11,6 +11,8 @@
   - [Release an export](#release-an-export)
   - [Removing checkpoints](#removing-checkpoints)
 - [Filesystem Consistency](#filesystem-consistency)
+- [Use Cases](#use-cases)
+  - [Creating full backups from existent checkpoints](#creating-full-backups-from-existent-checkpoints)
 - [Requirements](#requirements)
 - [TODO / Ideas](#todo--ideas)
 
@@ -127,6 +129,34 @@ Remove checkpoints via:
 
 If reachable, `vircpt` will attempt to freeze the domains file systems
 via Qemu agent.
+
+
+# Use Cases
+## Creating full backups from existent checkpoints
+
+In combination with other tools `vircpt` can be used to create backups.
+
+1) create a new checkpoint:
+
+```
+# vircpt -d vm4 create --name backupcheckpoint
+```
+
+2) export the checkpoint via NBD:
+
+```
+# vircpt -d vm4 export --name backupcheckpoint
+[..]
+INFO root vircpt - showcmd: Socket for exported checkpoint: [/var/tmp/vircpt.12780]
+[..]
+```
+
+3) backup the first disk (sda) data via `nbdcopy`:
+
+```
+# nbdcopy 'nbd+unix:///sda?socket=/var/tmp/vircpt.12377' -p backup-sda.img
+```
+
 
 # Requirements
 
