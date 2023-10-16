@@ -96,6 +96,8 @@ def show(domObj: libvirt.virDomain):
 def _createExportXml(args: Namespace, diskList) -> str:
     """Create xml required for exporting checkpoint"""
     top = ElementTree.Element("domainbackup", {"mode": "pull"})
+    inc = ElementTree.SubElement(top, "incremental")
+    inc.text = args.name
 
     ElementTree.SubElement(
         top, "server", {"transport": "unix", "socket": f"{args.socketfile}"}
