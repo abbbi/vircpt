@@ -164,7 +164,7 @@ As alternative, backup the first disk into an thin provisioned qcow2 image
 command output for example):
 
 ```
-# qemu-img create -f qcow2 backup-vdf.qcow2 2097152B && nbdcopy -p 'nbd+unix:///vdf?socket=/var/tmp/vircpt.15923' -- [ qemu-nbd -f qcow2 backup-vdf.qcow2 ]
+# qemu-img create -f qcow2 backup-sda.qcow2 2097152B && nbdcopy -p 'nbd+unix:///sda?socket=/var/tmp/vircpt.12377' -- [ qemu-nbd -f qcow2 backup-sda.qcow2 ]
 ```
 
 # Requirements
