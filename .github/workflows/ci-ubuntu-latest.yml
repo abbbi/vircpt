@@ -13,7 +13,7 @@ jobs:
     - name: codespell
       run: |
         sudo apt-get update
-        sudo apt-get install codespell -y
+        sudo apt-get install codespell python3-libvirt python3-lxml -y
         codespell .
     - name: Python code format test
       run: |
