@@ -33,6 +33,9 @@ Libvirt checkpoint swiss army knife.
  * delete checkpoints
  * list checkpoints
  * export checkpoints using the internal QEMU NBD server
+ 
+Check the [Use Cases](#use-cases) for more examples why this may
+be useful to you.
 
 # Examples
 
