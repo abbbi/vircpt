@@ -23,7 +23,7 @@ log = logging.getLogger()
 def Optical(device: list, dev: str) -> bool:
     """Check if device is cdrom or floppy"""
     if device in ("cdrom", "floppy"):
-        log.info("Skipping attached [%s] device: [%s].", device, dev)
+        log.info("Excluding attached [%s] device: [%s].", device, dev)
         return True
 
     return False
@@ -33,7 +33,7 @@ def Lun(device: list, dev: str) -> bool:
     """Check if device is direct attached LUN"""
     if device == "lun":
         log.warning(
-            "Skipping direct attached lun [%s], use option --raw to include",
+            "Excluding direct attached lun [%s].",
             dev,
         )
         return True
@@ -45,7 +45,7 @@ def Block(disk: _Element, dev: str) -> bool:
     """Check if device is direct attached block type device"""
     if disk.xpath("target")[0].get("type") == "block":
         log.warning(
-            "Block device [%s] excluded by default, use option --raw to include.",
+            "Excluding unsupported block device [%s].",
             dev,
         )
         return True
@@ -57,7 +57,7 @@ def Raw(diskFormat: str, dev: str) -> bool:
     """Check if disk has RAW disk format"""
     if diskFormat == "raw":
         log.warning(
-            "Raw disk [%s] excluded by default, use option --raw to include.",
+            "Excluding unsupported raw disk [%s].",
             dev,
         )
         return True

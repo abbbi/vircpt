@@ -208,13 +208,11 @@ class client:
                 log.warning("Excluding disk [%s] from operation as requested", dev)
                 continue
 
-            # skip cdrom/floppy devices
-            if disktype.Optical(device, dev):
-                continue
-
-            # include other direct attached devices if --raw option is enabled
-            if args.raw is False and (
-                disktype.Block(disk, dev)
+            # skip cdrom/floppy and raw devices which do not support
+            # creating checkpoints
+            if (
+                disktype.Optical(device, dev)
+                or disktype.Block(disk, dev)
                 or disktype.Lun(device, dev)
                 or disktype.Raw(diskFormat, dev)
             ):

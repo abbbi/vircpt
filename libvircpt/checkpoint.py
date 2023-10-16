@@ -122,10 +122,6 @@ def export(
 ) -> None:
     """Export checkpoint data via NBD"""
     exportXml = _createExportXml(args, diskList)
-    try:
-        log.debug("Starting checkpoint export via API.")
-        domObj.backupBegin(exportXml, None)
-        log.debug("Started export via API.")
-    except Exception as e:
-        log.exception(e)
-        raise e
+    log.debug("Starting checkpoint export via API.")
+    domObj.backupBegin(exportXml, None)
+    log.debug("Started export via API.")
