@@ -206,12 +206,6 @@ INFO root vircpt - showcmd: Socket for exported checkpoint: [/var/tmp/vircpt.127
 # qemu-system-<arch> -hda /tmp/image_sda.qcow2 -m 2500 --enable-kvm
 ```
 
-## Recover single files
-
-Once the NBD export is attached to an overlay image or an usable NBD device,
-you can mount the file systems from the virtual machine and recover lost files
-which may still be existent at the time the checkpoint was taken.
-
 ## Agentless clamav or other anti virus engines
 
 You can attach or mount the created NBD export and execute anti virus
