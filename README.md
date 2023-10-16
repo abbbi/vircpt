@@ -14,7 +14,6 @@
 - [Use Cases](#use-cases)
   - [Creating full backups from existent checkpoints](#creating-full-backups-from-existent-checkpoints)
   - [Boot the system from a checkpoint](#boot-the-system-from-a-checkpoint)
-  - [Recover single files](#recover-single-files)
   - [Agentless clamav or other anti virus engines](#agentless-clamav-or-other-anti-virus-engines)
 - [Requirements](#requirements)
 - [TODO / Ideas](#todo--ideas)
