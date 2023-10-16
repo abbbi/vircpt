@@ -96,8 +96,6 @@ def show(domObj: libvirt.virDomain):
 def _createExportXml(args: Namespace, diskList) -> str:
     """Create xml required for exporting checkpoint"""
     top = ElementTree.Element("domainbackup", {"mode": "pull"})
-    inc = ElementTree.SubElement(top, "incremental")
-    inc.text = args.name
 
     ElementTree.SubElement(
         top, "server", {"transport": "unix", "socket": f"{args.socketfile}"}
@@ -110,7 +108,9 @@ def _createExportXml(args: Namespace, diskList) -> str:
         scratchFile = f"{args.scratchdir}/backup.{scratchId}.{disk.target}"
         log.debug("Using scratch file: %s", scratchFile)
         dE = ElementTree.SubElement(
-            disks, "disk", {"name": disk.target, "exportbitmap": args.name}
+            disks,
+            "disk",
+            {"name": disk.target, "exportbitmap": args.name, "incremental": args.name},
         )
         ElementTree.SubElement(dE, "scratch", {"file": f"{scratchFile}"})
 
