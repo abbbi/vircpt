@@ -223,6 +223,7 @@ itself.
  * libvirt / qemu versions with checkpoint support
  * virtual machine must have qcow v3 versioned images with persistent bitmap
    support.
+ * libnbd executables (nbdinfo, nbdcopy)
 
 # TODO / Ideas
 
