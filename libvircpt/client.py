@@ -38,6 +38,7 @@ class DomainDisk:
     format: str
     filename: str
     path: str
+    size: int
 
 
 def libvirt_ignore(
@@ -242,7 +243,7 @@ class client:
                 log.error("Unable to detect disk source for disk [%s]", dev)
                 continue
 
-            diskFileName = os.path.basename(diskPath)
+            diskFileName = diskPath
 
             if args.include is not None and dev != args.include:
                 log.info(
@@ -252,7 +253,7 @@ class client:
                 )
                 continue
 
-            devices.append(DomainDisk(dev, diskFormat, diskFileName, diskPath))
+            devices.append(DomainDisk(dev, diskFormat, diskFileName, diskPath, 0))
 
         log.debug("Device list: %s ", devices)
         return devices

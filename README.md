@@ -151,12 +151,19 @@ INFO root vircpt - showcmd: Socket for exported checkpoint: [/var/tmp/vircpt.127
 [..]
 ```
 
-3) backup the first disk (sda) data via `nbdcopy`:
+3) backup the first disk (sda) data via `nbdcopy` into a full raw device:
 
 ```
 # nbdcopy 'nbd+unix:///sda?socket=/var/tmp/vircpt.12377' -p backup-sda.img
 ```
 
+As alternative, backup the first disk into an thin provisioned qcow2 image
+(size of the image depends on your setup, see the export
+command output for example):
+
+```
+# qemu-img create -f qcow2 backup-vdf.qcow2 2097152B && nbdcopy -p 'nbd+unix:///vdf?socket=/var/tmp/vircpt.15923' -- [ qemu-nbd -f qcow2 backup-vdf.qcow2 ]
+```
 
 # Requirements
 

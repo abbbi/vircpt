@@ -72,6 +72,16 @@ def showcmd(args, diskList):
             args.socketfile,
             disk.target,
         )
+        logging.info(
+            " [qemu-img create -f qcow2 backup-%s.qcow2 %sB && "
+            "nbdcopy -p 'nbd+unix:///%s?socket=%s' -- [ qemu-nbd -f qcow2 backup-%s.qcow2 ]]"
+            ,
+            disk.target,
+            disk.size,
+            disk.target,
+            args.socketfile,
+            disk.target,
+        )
         cnt += 1
     logging.info("-----------------------------------")
 
@@ -202,6 +212,16 @@ def main() -> None:
     vmConfig = virtClient.getDomainConfig(domObj)
     diskList = virtClient.getDomainDisks(args, vmConfig)
 
+    if not domObj.isActive():
+        logging.error("Virtual machine must be running.")
+        sys.exit(1)
+
+    for disk in diskList:
+        try:
+            disk.size = domObj.blockInfo(disk.target)[0]
+        except libvirtError as e:
+            logging.warning("Unable to get disk size: [%s]", e)
+
     freezed = False
     if args.command == "create":
         try:
@@ -211,7 +231,9 @@ def main() -> None:
                 fs.thaw(domObj)
             logging.info("Disks covered by checkpoint:")
             for disk in diskList:
-                logging.info(" [%s]:[%s]", disk.target, disk.filename)
+                logging.info(
+                    " [%s]:[%s] size: [%sB]", disk.target, disk.filename, disk.size
+                )
         except libvirtError as e:
             logging.error("Failed to create checkpoint: [%s]", e)
         finally:
