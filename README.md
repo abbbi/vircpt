@@ -32,7 +32,7 @@ Libvirt checkpoint swiss army knife.
  * create checkpoints
  * delete checkpoints
  * list checkpoints
- * export checkpoints via NBD server backend
+ * export checkpoints using the internal QEMU NBD server
 
 # Examples
 
