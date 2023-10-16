@@ -248,8 +248,11 @@ def main() -> None:
 
     if args.command == "release":
         logging.info("Releasing export.")
-        if virtClient.blockJobActive(domObj, diskList):
-            virtClient.stopExport(domObj)
+        try:
+            if virtClient.blockJobActive(domObj, diskList):
+                virtClient.stopExport(domObj)
+        except libvirtError as e:
+            logging.error("Failed to release: [%s]", e)
 
     if counter.count.errors > 0:
         logging.error("Error during checkpoint handling")
