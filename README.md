@@ -13,6 +13,7 @@
 - [Filesystem Consistency](#filesystem-consistency)
 - [Use Cases](#use-cases)
   - [Creating full backups from existent checkpoints](#creating-full-backups-from-existent-checkpoints)
+  - [Boot a system from a checkpoint](#boot-a-system-from-a-checkpoint)
 - [Requirements](#requirements)
 - [TODO / Ideas](#todo--ideas)
 
@@ -166,6 +167,40 @@ command output for example):
 ```
 # qemu-img create -f qcow2 backup-sda.qcow2 2097152B && nbdcopy -p 'nbd+unix:///sda?socket=/var/tmp/vircpt.12377' -- [ qemu-nbd -f qcow2 backup-sda.qcow2 ]
 ```
+
+## Boot a system from a checkpoint
+
+An exported checkpoint can also be booted, this is useful for things like:
+
+ * Examining the virtual machine at a given state
+ * Testing system updates without having to clone the complete virtual machine
+ * Restoring files
+ 
+Using an overlay image with the read only NBD backend, this will consume way
+less disk space than a complete virtual machine clone.
+
+1) Create an export for a created checkpoint (`bootme`):
+
+```
+# vircpt -d vm4 export --name bootme
+[..]
+INFO root vircpt - showcmd: Socket for exported checkpoint: [/var/tmp/vircpt.12780]
+[..]
+```
+
+1) Map the checkpoint to an qcow overlay image:
+
+```
+# qemu-img create -F raw -b nbd+unix:///sda?socket=/var/tmp/vircpt.12780 -f qcow2 /tmp/image_sda.qcow2
+```
+
+2) Boot the image using qemu (or as alternative, create a new libvirt virtual
+   machine config and attach the created overlay image):
+
+```
+# qemu-system-<arch> -hda /tmp/image_sda.qcow2 -m 2500 --enable-kvm
+```
+
 
 # Requirements
 
