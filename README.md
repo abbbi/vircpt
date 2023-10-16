@@ -13,7 +13,9 @@
 - [Filesystem Consistency](#filesystem-consistency)
 - [Use Cases](#use-cases)
   - [Creating full backups from existent checkpoints](#creating-full-backups-from-existent-checkpoints)
-  - [Boot a system from a checkpoint](#boot-a-system-from-a-checkpoint)
+  - [Boot the system from a checkpoint](#boot-the-system-from-a-checkpoint)
+  - [Recover single files](#recover-single-files)
+  - [Agentless clamav or other anti virus engines](#agentless-clamav-or-other-anti-virus-engines)
 - [Requirements](#requirements)
 - [TODO / Ideas](#todo--ideas)
 
@@ -168,7 +170,7 @@ command output for example):
 # qemu-img create -f qcow2 backup-sda.qcow2 2097152B && nbdcopy -p 'nbd+unix:///sda?socket=/var/tmp/vircpt.12377' -- [ qemu-nbd -f qcow2 backup-sda.qcow2 ]
 ```
 
-## Boot a system from a checkpoint
+## Boot the system from a checkpoint
 
 An exported checkpoint can also be booted, this is useful for things like:
 
@@ -201,6 +203,17 @@ INFO root vircpt - showcmd: Socket for exported checkpoint: [/var/tmp/vircpt.127
 # qemu-system-<arch> -hda /tmp/image_sda.qcow2 -m 2500 --enable-kvm
 ```
 
+## Recover single files
+
+Once the NBD export is attached to an overlay image or an usable NBD device,
+you can mount the file systems from the virtual machine and recover lost files
+which may still be existent at the time the checkpoint was taken.
+
+## Agentless clamav or other anti virus engines
+
+You can attach or mount the created NBD export and execute anti virus
+engines without having to install the engine in the virtual machine
+itself.
 
 # Requirements
 
