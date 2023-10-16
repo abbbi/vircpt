@@ -79,9 +79,11 @@ INFO root vircpt - main: Useful commands:
 INFO root vircpt - main: -----------------------------------
 INFO root vircpt - main: [nbdinfo 'nbd+unix:///?socket=/var/tmp/vircpt.207990' --list]
 INFO root vircpt - main: Disk: sda
-INFO root vircpt - main:  [qemu-img create -F raw -b nbd+unix:///sda?socket=/var/tmp/vircpt.207990 -f qcow2 /tmp/image_sda.qcow2]
-INFO root vircpt - main:  [qemu-nbd -c /dev/nbd0 /tmp/image_sda.qcow2]  && [virsh attach-disk tgtvm --source /dev/nbd0  --target vdX]
-INFO root vircpt - main:  [qemu-nbd -c /dev/nbd0 'nbd+unix:///sda?socket=/var/tmp/vircpt.207990' -r] && [fdisk -l /dev/nbd0]
+INFO root vircpt - showcmd:  [qemu-img create -F raw -b nbd+unix:///sda?socket=/var/tmp/vircpt.207990 -f qcow2 /tmp/image_sda.qcow2]
+INFO root vircpt - showcmd:  [qemu-nbd -c /dev/nbd0 /tmp/image_sda.qcow2]  && [virsh attach-disk tgtvm --source /dev/nbd0 --target vdX]
+INFO root vircpt - showcmd:  [qemu-nbd -c /dev/nbd0 'nbd+unix:///sda?socket=/var/tmp/vircpt.207990' -r] && [fdisk -l /dev/nbd0]
+INFO root vircpt - showcmd:  [nbdcopy 'nbd+unix:///sda?socket=/var/tmp/vircpt.207990' -p backup-sda.img]
+INFO root vircpt - showcmd:  [qemu-img create -f qcow2 backup-sda.qcow2 1048576B && nbdcopy -p 'nbd+unix:///sda?socket=/var/tmp/vircpt.207990' -- [ qemu-nbd -f qcow2 backup-sda.qcow2 ]]
 INFO root vircpt - main: -----------------------------------
 INFO root vircpt - main: Finished successfully
 ```
