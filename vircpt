@@ -36,6 +36,17 @@ from libvircpt.exceptions import (
 __version__ = "0.1"
 
 
+def execute(cmd):
+    """execute command and print stdout"""
+    try:
+        proc = command.run(cmd)
+        print(proc.stdout)
+    except CalledProcessError as e:
+        logging.error("Error during command execution: [%s]", e.stderr)
+    except FileNotFoundError as e:
+        logging.error("%s", e)
+
+
 def showcmd(args, diskList):
     """Show useful commands"""
     logging.info("Socket for exported checkpoint: [%s]", args.socketfile)
@@ -303,39 +314,26 @@ def main() -> None:
             args.command = "nbdinfo"
 
     if args.command == "nbdinfo":
-        try:
-            proc = command.run(
-                [
-                    "nbdinfo",
-                    f"nbd+unix:///?socket={args.socketfile}",
-                    "--list",
-                    "--json",
-                ]
-            )
-            print(proc.stdout)
-        except CalledProcessError as e:
-            logging.error("Error during command execution: [%s]", e.stderr)
-        except FileNotFoundError as e:
-            logging.error("%s", e)
-
+        execute(
+            [
+                "nbdinfo",
+                f"nbd+unix:///?socket={args.socketfile}",
+                "--list",
+                "--json",
+            ]
+        )
 
     if args.command == "nbdmap":
         logging.info("Checkpoint/bitmap mapping:")
-        try:
-            for disk in diskList:
-                logging.info("Disk: [%s]:[%s]", disk.target, disk.path)
-                proc = command.run(
-                    [
-                        "nbdinfo",
-                        f"nbd+unix:///{disk.target}?socket={args.socketfile}",
-                        f"--map=qemu:dirty-bitmap:{args.name}",
-                    ]
-                )
-                print(proc.stdout)
-        except CalledProcessError as e:
-            logging.error("Error during command execution: [%s]", e.stderr)
-        except FileNotFoundError as e:
-            logging.error("%s", e)
+        for disk in diskList:
+            logging.info("Disk: [%s]:[%s]", disk.target, disk.path)
+            execute(
+                [
+                    "nbdinfo",
+                    f"nbd+unix:///{disk.target}?socket={args.socketfile}",
+                    f"--map=qemu:dirty-bitmap:{args.name}",
+                ]
+            )
 
     if args.command == "release":
         logging.info("Releasing export.")
