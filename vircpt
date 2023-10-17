@@ -21,6 +21,7 @@ import logging
 import argparse
 from getpass import getuser
 from subprocess import CalledProcessError
+import rich
 from libvirt import libvirtError
 from libvircpt import client as virt
 from libvircpt import checkpoint
@@ -40,11 +41,18 @@ def execute(cmd):
     """execute command and print stdout"""
     try:
         proc = command.run(cmd)
-        print(proc.stdout)
     except CalledProcessError as e:
         logging.error("Error during command execution: [%s]", e.stderr)
+        return
     except FileNotFoundError as e:
         logging.error("%s", e)
+        return
+
+    if "--json" not in cmd:
+        print(proc.stdout)
+        return
+
+    rich.print_json(proc.stdout)
 
 
 def showcmd(args, diskList):
@@ -331,7 +339,8 @@ def main() -> None:
                 [
                     "nbdinfo",
                     f"nbd+unix:///{disk.target}?socket={args.socketfile}",
-                    f"--map=qemu:dirty-bitmap:{args.name}", "--json"
+                    f"--map=qemu:dirty-bitmap:{args.name}",
+                    "--json",
                 ]
             )
 
