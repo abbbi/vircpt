@@ -19,27 +19,10 @@ import logging
 import subprocess
 from typing import List
 
-from libvircpt.processinfo import processInfo
-
 log = logging.getLogger(__name__)
 
 
-def run(cmdLine: List[str]) -> processInfo:
+def run(cmdLine: List[str]):
     """Execute passed command"""
     log.debug("CMD: %s", " ".join(cmdLine))
-    with subprocess.Popen(
-        cmdLine,
-        close_fds=False,
-        stderr=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-    ) as p:
-        p.wait()
-        log.debug("Return code: %s", p.returncode)
-        if p.returncode != 0:
-            log.error("CMD: %s", " ".join(cmdLine))
-        err = str(p.stderr)
-        out = str(p.stdout)
-        process = processInfo(p.pid, err, out)
-        log.debug("Executed [%s] process: [%s]", cmdLine[0], process)
-
-    return process
+    return subprocess.run(cmdLine, capture_output=True, text=True, check=True)

@@ -20,12 +20,14 @@ import sys
 import logging
 import argparse
 from getpass import getuser
+from subprocess import CalledProcessError
 from libvirt import libvirtError
 from libvircpt import client as virt
 from libvircpt import checkpoint
 from libvircpt import common as lib
 from libvircpt.logcount import logCount
 from libvircpt import fs
+from libvircpt import command
 from libvircpt.exceptions import (
     domainNotFound,
     connectionFailed,
@@ -74,8 +76,7 @@ def showcmd(args, diskList):
         )
         logging.info(
             " [qemu-img create -f qcow2 backup-%s.qcow2 %sB && "
-            "nbdcopy -p 'nbd+unix:///%s?socket=%s' -- [ qemu-nbd -f qcow2 backup-%s.qcow2 ]]"
-            ,
+            "nbdcopy -p 'nbd+unix:///%s?socket=%s' -- [ qemu-nbd -f qcow2 backup-%s.qcow2 ]]",
             disk.target,
             disk.size,
             disk.target,
@@ -182,6 +183,14 @@ def main() -> None:
     parser_export.add_argument(
         "--name", type=str, help="Name of the checkpoint", required=True
     )
+    parser_info = sub_parsers.add_parser("info", help="Show Export info")
+    parser_info.add_argument(
+        "-f",
+        "--socketfile",
+        type=str,
+        help="Socket to query info from.",
+        required=True,
+    )
     parser_export.add_argument(
         "-f",
         "--socketfile",
@@ -273,6 +282,22 @@ def main() -> None:
                 showcmd(args, diskList)
             except libvirtError as e:
                 logging.error("Failed to export checkpoint: [%s]", e)
+
+    if args.command == "info":
+        try:
+            proc = command.run(
+                [
+                    "nbdinfo",
+                    f"nbd+unix:///?socket={args.socketfile}",
+                    "--list",
+                    "--json",
+                ]
+            )
+            print(proc.stdout)
+        except CalledProcessError as e:
+            logging.error("Error during command execution: [%s]", e)
+        except FileNotFoundError as e:
+            logging.error("%s", e)
 
     if args.command == "release":
         logging.info("Releasing export.")
