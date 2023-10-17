@@ -188,6 +188,19 @@ class client:
 
         return diskPath
 
+    def getDomainDisksFromCheckpoint(self, cptConfig: str) -> List[DomainDisk]:
+        """Parse checkpoint for disk devices included in checkpoint xml,
+        skip devices which have been excluded"""
+        tree = xml.asTree(cptConfig)
+        devices = []
+        for disk in tree.xpath("disks/disk"):
+            if disk.get("checkpoint") == "no":
+                continue
+            dev = disk.get("name")
+            devices.append(DomainDisk(dev, "", "", "", 0))
+
+        return devices
+
     def getDomainDisks(self, args: Namespace, vmConfig: str) -> List[DomainDisk]:
         """Parse virtual machine configuration for disk devices, filter
         all non supported devices

@@ -185,7 +185,7 @@ command output for example):
 You can also use the nbdcopy option for this:
 
 ```
-# vircpt -d vm4 nbdcopy -f /var/tmp/vircpt.117595
+# vircpt -d vm4 nbdcopy -f /var/tmp/vircpt.117595 --name backupcheckpoint
 [..]
 # ls -alrht backup*
 -rw-r--r-- 1 abi abi 448K Oct 17 23:01 backup-sda.qcow2

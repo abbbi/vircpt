@@ -240,6 +240,9 @@ def main() -> None:
         help="Socket to copy data from.",
         required=True,
     )
+    parser_nbdcopy.add_argument(
+        "--name", type=str, help="Name of the checkpoint", required=True
+    )
     parser_nbdmap.add_argument(
         "--name", type=str, help="Name of the checkpoint", required=True
     )
@@ -342,9 +345,11 @@ def main() -> None:
         )
 
     if args.command == "nbdmap":
+        cpt = checkpoint.exists(domObj, args.name)
+        diskList = virtClient.getDomainDisksFromCheckpoint(cpt.getXMLDesc())
         logging.info("Checkpoint/bitmap mapping:")
         for disk in diskList:
-            logging.info("Disk: [%s]:[%s]", disk.target, disk.path)
+            logging.info("Disk: [%s]", disk.target)
             execute(
                 [
                     "nbdinfo",
@@ -356,7 +361,10 @@ def main() -> None:
 
     if args.command == "nbdcopy":
         logging.info("Copy full image using nbdcopy")
+        cpt = checkpoint.exists(domObj, args.name)
+        diskList = virtClient.getDomainDisksFromCheckpoint(cpt.getXMLDesc())
         for disk in diskList:
+            disk.size = domObj.blockInfo(disk.target)[0]
             logging.info("Disk: [%s]:[%s]", disk.target, disk.path)
             execute(
                 [
