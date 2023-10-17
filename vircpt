@@ -205,6 +205,13 @@ def main() -> None:
     parser_export.add_argument(
         "--showinfo", help="Show NBD export info too.", action="store_true"
     )
+    parser_export.add_argument(
+        "-f",
+        "--socketfile",
+        default=f"/var/tmp/vircpt.{os.getpid()}",
+        type=str,
+        help="Use specified file for NBD Server socket (default: %(default)s)",
+    )
     parser_nbdinfo = sub_parsers.add_parser("nbdinfo", help="Show Export info")
     parser_nbdinfo.add_argument(
         "-f",
@@ -223,15 +230,18 @@ def main() -> None:
         help="Socket to query info from.",
         required=True,
     )
-    parser_nbdmap.add_argument(
-        "--name", type=str, help="Name of the checkpoint", required=True
+    parser_nbdcopy = sub_parsers.add_parser(
+        "nbdcopy", help="Copy data to qcow file using nbdcopy"
     )
-    parser_export.add_argument(
+    parser_nbdcopy.add_argument(
         "-f",
         "--socketfile",
-        default=f"/var/tmp/vircpt.{os.getpid()}",
         type=str,
-        help="Use specified file for NBD Server socket (default: %(default)s)",
+        help="Socket to copy data from.",
+        required=True,
+    )
+    parser_nbdmap.add_argument(
+        "--name", type=str, help="Name of the checkpoint", required=True
     )
     sub_parsers.add_parser("release", help="Stop exporting.")
 
@@ -341,6 +351,33 @@ def main() -> None:
                     f"nbd+unix:///{disk.target}?socket={args.socketfile}",
                     f"--map=qemu:dirty-bitmap:{args.name}",
                     "--json",
+                ]
+            )
+
+    if args.command == "nbdcopy":
+        logging.info("Copy full image using nbdcopy")
+        for disk in diskList:
+            execute(
+                [
+                    "qemu-img",
+                    "create",
+                    "-f",
+                    "qcow2",
+                    f"backup-{disk.target}.qcow2",
+                    f"{disk.size}B",
+                ]
+            )
+            execute(
+                [
+                    "nbdcopy",
+                    f"nbd+unix:///{disk.target}?socket={args.socketfile}",
+                    "--",
+                    "[",
+                    "qemu-nbd",
+                    "-f",
+                    "qcow2",
+                    f"backup-{disk.target}.qcow2",
+                    "]",
                 ]
             )
 

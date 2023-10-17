@@ -182,6 +182,16 @@ command output for example):
 # qemu-img create -f qcow2 backup-sda.qcow2 2097152B && nbdcopy -p 'nbd+unix:///sda?socket=/var/tmp/vircpt.12377' -- [ qemu-nbd -f qcow2 backup-sda.qcow2 ]
 ```
 
+You can also use the nbdcopy option for this:
+
+```
+# vircpt -d vm4 nbdcopy -f /var/tmp/vircpt.117595
+[..]
+# ls -alrht backup*
+-rw-r--r-- 1 abi abi 448K Oct 17 23:01 backup-sda.qcow2
+-rw-r--r-- 1 abi abi 704K Oct 17 23:01 backup-vdf.qcow2
+```
+
 ## Boot the system from a checkpoint
 
 An exported checkpoint can also be booted, this is useful for things like:
