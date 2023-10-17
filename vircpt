@@ -314,7 +314,7 @@ def main() -> None:
             )
             print(proc.stdout)
         except CalledProcessError as e:
-            logging.error("Error during command execution: [%s]", e)
+            logging.error("Error during command execution: [%s]", e.stderr)
         except FileNotFoundError as e:
             logging.error("%s", e)
 
