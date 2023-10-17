@@ -69,7 +69,7 @@ INFO root vircpt - main: Finished successfully
 
 ## Start NBD export for a specific checkpoint
 
-To access the virtual machine checkpoint data, use the export
+To access the virtual machine disk image and checkpoint data, use the export
 parameter:
 
 ```
@@ -115,6 +115,10 @@ export="sda":
         is_rotational: false
 [..]
 ```
+
+In order to query the bitmap information about changed blocks since the
+checkpoint was created, an NBD client which supports the NBD meta context
+option is required.
 
 ## Release an export
 
