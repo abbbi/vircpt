@@ -194,6 +194,19 @@ def main() -> None:
         help="Socket to query info from.",
         required=True,
     )
+    parser_nbdmap = sub_parsers.add_parser(
+        "nbdmap", help="Show checkpoint/bitmap extent info"
+    )
+    parser_nbdmap.add_argument(
+        "-f",
+        "--socketfile",
+        type=str,
+        help="Socket to query info from.",
+        required=True,
+    )
+    parser_nbdmap.add_argument(
+        "--name", type=str, help="Name of the checkpoint", required=True
+    )
     parser_export.add_argument(
         "-f",
         "--socketfile",
@@ -302,6 +315,25 @@ def main() -> None:
             print(proc.stdout)
         except CalledProcessError as e:
             logging.error("Error during command execution: [%s]", e)
+        except FileNotFoundError as e:
+            logging.error("%s", e)
+
+
+    if args.command == "nbdmap":
+        logging.info("Checkpoint/bitmap mapping:")
+        try:
+            for disk in diskList:
+                logging.info("Disk: [%s]:[%s]", disk.target, disk.path)
+                proc = command.run(
+                    [
+                        "nbdinfo",
+                        f"nbd+unix:///{disk.target}?socket={args.socketfile}",
+                        f"--map=qemu:dirty-bitmap:{args.name}",
+                    ]
+                )
+                print(proc.stdout)
+        except CalledProcessError as e:
+            logging.error("Error during command execution: [%s]", e.stderr)
         except FileNotFoundError as e:
             logging.error("%s", e)
 
