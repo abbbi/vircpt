@@ -111,7 +111,7 @@ export="sda":
         uri: nbd+unix:///sda?socket=/var/tmp/vircpt.207990
         contexts:
                 base:allocation
-                qemu:dirty-bitmap:backup-sda
+                qemu:dirty-bitmap:foo-sda
         is_rotational: false
 [..]
 ```
