@@ -120,6 +120,12 @@ def main() -> None:
             "\t%(prog)s -d vm list\n"
             "   # export checkpoint via NBD accessible via unix socket:\n"
             "\t%(prog)s -d vm export --name mycpt\n"
+            "   # show export info:\n"
+            "\t%(prog)s -d vm nbdinfo -f /var/tmp/vircpt.109298\n"
+            "   # show bitmap mapping:\n"
+            "\t%(prog)s -d vm nbdmap --name TEST -f /var/tmp/vircpt.120380\n"
+            "   # create full backup using nbdcopy:\n"
+            "\t%(prog)s -d vm nbdcopy -f /var/tmp/vircpt.120380 --name mycpt\n"
             "   # release export:\n"
             "\t%(prog)s -d vm release\n"
         ),
