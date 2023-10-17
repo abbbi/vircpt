@@ -8,6 +8,7 @@
   - [Creating an checkpoint](#creating-an-checkpoint)
   - [List checkpoints](#list-checkpoints)
   - [Start NBD export for a specific checkpoint](#start-nbd-export-for-a-specific-checkpoint)
+  - [Query export information for a specific checkpoint](#query-export-information-for-a-specific-checkpoint)
   - [Release an export](#release-an-export)
   - [Removing checkpoints](#removing-checkpoints)
 - [Filesystem Consistency](#filesystem-consistency)
@@ -101,6 +102,9 @@ NBD socket endpoint, such as:
  * Setup and NBD Device for the overlay image, which can then be attached
  to another virtual machine
 
+Its also possible to show detailed information about the NBD export
+via `--showinfo` option.
+
 nbdinfo example:
 
 ```
@@ -119,6 +123,27 @@ export="sda":
 In order to query the bitmap information about changed blocks since the
 checkpoint was created, an NBD client which supports the NBD meta context
 option is required.
+
+## Query export information for a specific checkpoint
+
+In order to show the bitmap block mappings use:
+
+```
+# vircpt -d vm4 nbdmap --name TEST -f /var/tmp/vircpt.115025
+INFO lib common - printVersion: Version: 0.1 Arguments: ./vircpt -d vm4 nbdmap --name TEST -f /var/tmp/vircpt.115025
+INFO root vircpt - main: Libvirt library version: [9000000]
+WARNING root disktype - Raw: Excluding unsupported raw disk [sdb].
+INFO root vircpt - main: Checkpoint/bitmap mapping:
+INFO root vircpt - main: Disk: [sda]:[/tmp/tmp.ReIIt657Nw/vm4-sda.qcow2]
+[
+  {
+    "offset": 0,
+    "length": 1048576,
+    "type": 0,
+    "description": "clean"
+  }
+]
+```
 
 ## Release an export
 
@@ -221,6 +246,7 @@ itself.
  * virtual machine must have qcow v3 versioned images with persistent bitmap
    support.
  * libnbd executables (nbdinfo, nbdcopy)
+ * python modules: python3-rich, python3-lxml
 
 # TODO / Ideas
 
