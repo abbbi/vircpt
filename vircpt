@@ -183,6 +183,9 @@ def main() -> None:
     parser_export.add_argument(
         "--name", type=str, help="Name of the checkpoint", required=True
     )
+    parser_export.add_argument(
+        "--showinfo", help="Show NBD export info too.", action="store_true"
+    )
     parser_info = sub_parsers.add_parser("info", help="Show Export info")
     parser_info.add_argument(
         "-f",
@@ -282,6 +285,9 @@ def main() -> None:
                 showcmd(args, diskList)
             except libvirtError as e:
                 logging.error("Failed to export checkpoint: [%s]", e)
+
+        if args.showinfo:
+            args.command = "info"
 
     if args.command == "info":
         try:
