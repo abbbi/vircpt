@@ -331,7 +331,7 @@ def main() -> None:
                 [
                     "nbdinfo",
                     f"nbd+unix:///{disk.target}?socket={args.socketfile}",
-                    f"--map=qemu:dirty-bitmap:{args.name}",
+                    f"--map=qemu:dirty-bitmap:{args.name}", "--json"
                 ]
             )
 
