@@ -357,6 +357,7 @@ def main() -> None:
     if args.command == "nbdcopy":
         logging.info("Copy full image using nbdcopy")
         for disk in diskList:
+            logging.info("Disk: [%s]:[%s]", disk.target, disk.path)
             execute(
                 [
                     "qemu-img",
