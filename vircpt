@@ -365,7 +365,7 @@ def main() -> None:
         diskList = virtClient.getDomainDisksFromCheckpoint(cpt.getXMLDesc())
         for disk in diskList:
             disk.size = domObj.blockInfo(disk.target)[0]
-            logging.info("Disk: [%s]:[%s]", disk.target, disk.path)
+            logging.info("Disk: [%s]", disk.target)
             execute(
                 [
                     "qemu-img",
