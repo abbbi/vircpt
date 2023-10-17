@@ -105,25 +105,6 @@ NBD socket endpoint, such as:
 Its also possible to show detailed information about the NBD export
 via `--showinfo` option.
 
-nbdinfo example:
-
-```
-# nbdinfo 'nbd+unix:///?socket=/var/tmp/vircpt.207990' --list
-protocol: newstyle-fixed without TLS, using structured packets
-export="sda":
-        export-size: 52428800 (50M)
-        uri: nbd+unix:///sda?socket=/var/tmp/vircpt.207990
-        contexts:
-                base:allocation
-                qemu:dirty-bitmap:foo-sda
-        is_rotational: false
-[..]
-```
-
-In order to query the bitmap information about changed blocks since the
-checkpoint was created, an NBD client which supports the NBD meta context
-option is required.
-
 ## Query export information for a specific checkpoint
 
 In order to show the bitmap block mappings use:
