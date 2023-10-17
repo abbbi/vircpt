@@ -186,8 +186,8 @@ def main() -> None:
     parser_export.add_argument(
         "--showinfo", help="Show NBD export info too.", action="store_true"
     )
-    parser_info = sub_parsers.add_parser("info", help="Show Export info")
-    parser_info.add_argument(
+    parser_nbdinfo = sub_parsers.add_parser("nbdinfo", help="Show Export info")
+    parser_nbdinfo.add_argument(
         "-f",
         "--socketfile",
         type=str,
@@ -287,9 +287,9 @@ def main() -> None:
                 logging.error("Failed to export checkpoint: [%s]", e)
 
         if args.showinfo:
-            args.command = "info"
+            args.command = "nbdinfo"
 
-    if args.command == "info":
+    if args.command == "nbdinfo":
         try:
             proc = command.run(
                 [
