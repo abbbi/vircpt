@@ -60,6 +60,12 @@ def execute(cmd):
     rich.print_json(proc.stdout)
 
 
+def refreshDiskList(args, virtClient, domObj):
+    """Refresh list about disks included in checkpoint"""
+    cpt = checkpoint.exists(domObj, args.name)
+    return virtClient.getDomainDisksFromCheckpoint(cpt.getXMLDesc())
+
+
 def showcmd(args, domObj, diskList):
     """Show useful commands"""
     logging.info("Socket for exported checkpoint: [%s]", args.socketfile)
@@ -245,18 +251,18 @@ def main() -> None:
 
     logging.info("Libvirt library version: [%s]", virtClient.libvirtVersion)
 
-    vmConfig = virtClient.getDomainConfig(domObj)
-    diskList = virtClient.getDomainDisks(args, vmConfig)
-
     if not domObj.isActive():
         logging.error("Virtual machine must be running.")
         sys.exit(1)
 
-    for disk in diskList:
-        try:
-            disk.size = domObj.blockInfo(disk.target)[0]
-        except libvirtError as e:
-            logging.warning("Unable to get disk size: [%s]", e)
+    if args.command in ["export", "create"]:
+        vmConfig = virtClient.getDomainConfig(domObj)
+        diskList = virtClient.getDomainDisks(args, vmConfig)
+        for disk in diskList:
+            try:
+                disk.size = domObj.blockInfo(disk.target)[0]
+            except libvirtError as e:
+                logging.warning("Unable to get disk size: [%s]", e)
 
     if args.command in ["nbdinfo", "nbdcopy", "nbdmap", "overlay"]:
         sockpath = f"/var/tmp/vircpt.{args.domain}.*"
@@ -319,8 +325,7 @@ def main() -> None:
             )
         else:
             try:
-                cpt = checkpoint.exists(domObj, args.name)
-                diskList = virtClient.getDomainDisksFromCheckpoint(cpt.getXMLDesc())
+                diskList = refreshDiskList(args, virtClient, domObj)
                 checkpoint.export(args, domObj, diskList)
                 showcmd(args, domObj, diskList)
             except libvirtError as e:
@@ -340,8 +345,7 @@ def main() -> None:
         )
 
     if args.command == "nbdmap":
-        cpt = checkpoint.exists(domObj, args.name)
-        diskList = virtClient.getDomainDisksFromCheckpoint(cpt.getXMLDesc())
+        diskList = refreshDiskList(args, virtClient, domObj)
         logging.info("Checkpoint/bitmap mapping:")
         for disk in diskList:
             logging.info("Disk: [%s]", disk.target)
@@ -356,8 +360,7 @@ def main() -> None:
 
     if args.command == "nbdcopy":
         logging.info("Copy full image using nbdcopy")
-        cpt = checkpoint.exists(domObj, args.name)
-        diskList = virtClient.getDomainDisksFromCheckpoint(cpt.getXMLDesc())
+        diskList = refreshDiskList(args, virtClient, domObj)
         for disk in diskList:
             disk.size = domObj.blockInfo(disk.target)[0]
             file = f"backup-{disk.target}.qcow2"
@@ -409,12 +412,8 @@ def main() -> None:
             )
 
     if args.command == "release":
-        logging.info("Releasing export.")
-        try:
-            if virtClient.blockJobActive(domObj, diskList):
-                virtClient.stopExport(domObj)
-        except libvirtError as e:
-            logging.error("Failed to release: [%s]", e)
+        logging.info("Releasing export")
+        virtClient.stopExport(domObj)
 
     if counter.count.errors > 0:
         logging.error("Error during checkpoint handling")
