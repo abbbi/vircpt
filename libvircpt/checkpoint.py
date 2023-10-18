@@ -93,13 +93,31 @@ def show(domObj: libvirt.virDomain):
         logging.info(" + %s", cpt.getName())
 
 
-def _createExportXml(args: Namespace, diskList) -> str:
-    """Create xml required for exporting checkpoint"""
-    top = ElementTree.Element("domainbackup", {"mode": "pull"})
+def getParent(args, domObj):
+    """Refresh list about disks included in checkpoint"""
+    parent = args.name
+    try:
+        return exists(domObj, args.name).getParent().getName()
+    except libvirt.libvirtError:
+        pass
 
+    return parent
+
+
+def _createExportXml(args: Namespace, domObj: libvirt.virDomain, diskList) -> str:
+    """Create xml required for exporting checkpoint"""
+    parent = getParent(args, domObj)
+    top = ElementTree.Element("domainbackup", {"mode": "pull"})
     ElementTree.SubElement(
         top, "server", {"transport": "unix", "socket": f"{args.socketfile}"}
     )
+
+    if parent != args.name:
+        incremental = ElementTree.SubElement(top, "incremental")
+        incremental.text = parent
+        logging.info("Export checkpoint based on parent checkpoint: [%s]", parent)
+    else:
+        parent = args.name
 
     disks = ElementTree.SubElement(top, "disks")
 
@@ -110,7 +128,7 @@ def _createExportXml(args: Namespace, diskList) -> str:
         dE = ElementTree.SubElement(
             disks,
             "disk",
-            {"name": disk.target, "exportbitmap": args.name, "incremental": args.name},
+            {"name": disk.target, "exportbitmap": parent, "incremental": parent},
         )
         ElementTree.SubElement(dE, "scratch", {"file": f"{scratchFile}"})
 
@@ -123,7 +141,7 @@ def export(
     diskList: List[Any],
 ) -> None:
     """Export checkpoint data via NBD"""
-    exportXml = _createExportXml(args, diskList)
+    exportXml = _createExportXml(args, domObj, diskList)
     log.debug("Starting checkpoint export via API.")
     domObj.backupBegin(exportXml, None)
     log.debug("Started export via API.")
