@@ -247,8 +247,15 @@ def main() -> None:
         except libvirtError as e:
             logging.warning("Unable to get disk size: [%s]", e)
 
-    if not args.command in ["release", "export", "create", "delete", "list"]:
-        args.name = glob.glob(f"/var/tmp/vircpt.{args.domain}.*")[0].split(".")[-1]
+    if args.command in ["nbdinfo", "nbdcopy", "nbdmap"]:
+        sockpath = f"/var/tmp/vircpt.{args.domain}.*"
+        try:
+            args.name = glob.glob(sockpath)[0].split(".")[-1]
+        except IndexError:
+            logging.error(
+                "Unable to get checkpoint name from socket path: [%s].", sockpath
+            )
+            sys.exit(1)
 
     if not args.command == "release":
         args.socketfile = f"/var/tmp/vircpt.{args.domain}.{args.name}"
@@ -275,6 +282,7 @@ def main() -> None:
         try:
             cpt = checkpoint.exists(domObj, args.name)
             checkpoint.delete(cpt)
+            logging.info("Removed checkpoint: [%s]", args.name)
         except libvirtError as e:
             logging.error("Failed to remove checkpoint: [%s]", e)
 
