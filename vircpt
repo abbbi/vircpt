@@ -318,6 +318,8 @@ def main() -> None:
             logging.error("Failed to list checkpoint: [%s]", e)
 
     if args.command == "export":
+        cpt = checkpoint.exists(domObj, args.name)
+        diskList = virtClient.getDomainDisksFromCheckpoint(cpt.getXMLDesc())
         active = False
         try:
             active = virtClient.blockJobActive(domObj, diskList)
