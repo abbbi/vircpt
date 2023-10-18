@@ -21,8 +21,8 @@ import argparse
 import glob
 from getpass import getuser
 from subprocess import CalledProcessError
-import rich
 import shutil
+import rich
 from libvirt import libvirtError
 from libvircpt import client as virt
 from libvircpt import checkpoint
