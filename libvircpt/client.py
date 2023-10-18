@@ -104,12 +104,6 @@ class client:
         no user and password are required."""
         return "authfile" in uri
 
-    @staticmethod
-    def _isSsh(uri: str) -> bool:
-        """If authentication file is passed or qemu+ssh is used,
-        no user and password are required."""
-        return uri.startswith("qemu+ssh")
-
     def _useAuth(self, args: Namespace) -> bool:
         """Check if we want to use advanced auth method"""
         if args.uri.startswith("qemu+"):
@@ -133,28 +127,12 @@ class client:
             )
             if (
                 not self._reqAuth(args.uri)
-                and not self._isSsh(args.uri)
                 and (not args.user or not args.password)
             ):
                 raise connectionFailed(
                     "Username (--user) and password (--password) required."
                 )
-            if not self._isSsh(args.uri):
-                conn = self._connectAuth(args.uri, args.user, args.password)
-            else:
-                conn = self._connectOpen(args.uri)
-
-            remoteHostname = conn.getHostname()
-            log.debug("Hostname returned by libvirt API: [%s]", remoteHostname)
-            if localHostname != remoteHostname:
-                log.info(
-                    "Connected to remote host: [%s], local host: [%s]",
-                    conn.getHostname(),
-                    gethostname(),
-                )
-                self.remoteHost = remoteHostname
-
-            return conn
+            return self._connectOpen(args.uri)
 
         log.debug("Connect libvirt using open function.")
 
