@@ -108,6 +108,13 @@ def showcmd(args, diskList):
 
 def main() -> None:
     """main"""
+    socketfile = os.environ.get("SOCKET")
+    if socketfile is not None:
+        socketfilereq = False
+    else:
+        socketfilereq = True
+        socketfile = f"/var/tmp/vircpt.{os.getpid()}"
+
     parser = argparse.ArgumentParser(
         description="Libvirt checkpoint swiss army knife",
         epilog=(
@@ -214,7 +221,7 @@ def main() -> None:
     parser_export.add_argument(
         "-f",
         "--socketfile",
-        default=f"/var/tmp/vircpt.{os.getpid()}",
+        default=socketfile,
         type=str,
         help="Use specified file for NBD Server socket (default: %(default)s)",
     )
@@ -223,8 +230,9 @@ def main() -> None:
         "-f",
         "--socketfile",
         type=str,
-        help="Socket to query info from.",
-        required=True,
+        help="Socket to query info from. (default: %(default)s)",
+        default=socketfile,
+        required=socketfilereq,
     )
     parser_nbdmap = sub_parsers.add_parser(
         "nbdmap", help="Show checkpoint/bitmap extent info"
@@ -234,7 +242,11 @@ def main() -> None:
         "--socketfile",
         type=str,
         help="Socket to query info from.",
-        required=True,
+        default=socketfile,
+        required=socketfilereq,
+    )
+    parser_nbdmap.add_argument(
+        "--name", type=str, help="Name of the checkpoint", required=True
     )
     parser_nbdcopy = sub_parsers.add_parser(
         "nbdcopy", help="Copy data to qcow file using nbdcopy"
@@ -243,13 +255,11 @@ def main() -> None:
         "-f",
         "--socketfile",
         type=str,
-        help="Socket to copy data from.",
-        required=True,
+        help="Socket to query info from.",
+        default=socketfile,
+        required=socketfilereq,
     )
     parser_nbdcopy.add_argument(
-        "--name", type=str, help="Name of the checkpoint", required=True
-    )
-    parser_nbdmap.add_argument(
         "--name", type=str, help="Name of the checkpoint", required=True
     )
     sub_parsers.add_parser("release", help="Stop exporting.")
