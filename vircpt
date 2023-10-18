@@ -108,13 +108,6 @@ def showcmd(args, diskList):
 
 def main() -> None:
     """main"""
-    socketfile = os.environ.get("SOCKET")
-    if socketfile is not None:
-        socketfilereq = False
-    else:
-        socketfilereq = True
-        socketfile = f"/var/tmp/vircpt.{os.getpid()}"
-
     parser = argparse.ArgumentParser(
         description="Libvirt checkpoint swiss army knife",
         epilog=(
@@ -218,32 +211,9 @@ def main() -> None:
     parser_export.add_argument(
         "--showinfo", help="Show NBD export info too.", action="store_true"
     )
-    parser_export.add_argument(
-        "-f",
-        "--socketfile",
-        default=socketfile,
-        type=str,
-        help="Use specified file for NBD Server socket (default: %(default)s)",
-    )
-    parser_nbdinfo = sub_parsers.add_parser("nbdinfo", help="Show Export info")
-    parser_nbdinfo.add_argument(
-        "-f",
-        "--socketfile",
-        type=str,
-        help="Socket to query info from. (default: %(default)s)",
-        default=socketfile,
-        required=socketfilereq,
-    )
+    sub_parsers.add_parser("nbdinfo", help="Show Export info")
     parser_nbdmap = sub_parsers.add_parser(
         "nbdmap", help="Show checkpoint/bitmap extent info"
-    )
-    parser_nbdmap.add_argument(
-        "-f",
-        "--socketfile",
-        type=str,
-        help="Socket to query info from.",
-        default=socketfile,
-        required=socketfilereq,
     )
     parser_nbdmap.add_argument(
         "--name", type=str, help="Name of the checkpoint", required=True
@@ -252,19 +222,15 @@ def main() -> None:
         "nbdcopy", help="Copy data to qcow file using nbdcopy"
     )
     parser_nbdcopy.add_argument(
-        "-f",
-        "--socketfile",
-        type=str,
-        help="Socket to query info from.",
-        default=socketfile,
-        required=socketfilereq,
-    )
-    parser_nbdcopy.add_argument(
         "--name", type=str, help="Name of the checkpoint", required=True
     )
     sub_parsers.add_parser("release", help="Stop exporting.")
 
     args = lib.argparse(parser)
+
+    args.socketfile = os.environ.get("SOCKET")
+    if args.socketfile is None:
+        args.socketfile = f"/var/tmp/vircpt.{args.domain}"
 
     counter = logCount()  # pylint: disable=unreachable
     lib.configLogger(args, counter)

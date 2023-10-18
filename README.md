@@ -79,17 +79,17 @@ INFO lib common - printVersion: Version: 0.1 Arguments: ./vircpt -d vm1 export -
 INFO root vircpt - main: Libvirt library version: [9000000]
 INFO root disktype - Optical: Skipping attached [cdrom] device: [sdb].
 INFO root disktype - Optical: Skipping attached [floppy] device: [fda].
-INFO root vircpt - main: Socket for exported checkpoint: [/var/tmp/vircpt.207990]
+INFO root vircpt - main: Socket for exported checkpoint: [/var/tmp/vircpt.vm1]
 INFO root vircpt - main: -----------------------------------
 INFO root vircpt - main: Useful commands:
 INFO root vircpt - main: -----------------------------------
-INFO root vircpt - main: [nbdinfo 'nbd+unix:///?socket=/var/tmp/vircpt.207990' --list]
+INFO root vircpt - main: [nbdinfo 'nbd+unix:///?socket=/var/tmp/vircpt.vm1' --list]
 INFO root vircpt - main: Disk: sda
-INFO root vircpt - showcmd:  [qemu-img create -F raw -b nbd+unix:///sda?socket=/var/tmp/vircpt.207990 -f qcow2 /tmp/image_sda.qcow2]
+INFO root vircpt - showcmd:  [qemu-img create -F raw -b nbd+unix:///sda?socket=/var/tmp/vircpt.vm1 -f qcow2 /tmp/image_sda.qcow2]
 INFO root vircpt - showcmd:  [qemu-nbd -c /dev/nbd0 /tmp/image_sda.qcow2]  && [virsh attach-disk tgtvm --source /dev/nbd0 --target vdX]
-INFO root vircpt - showcmd:  [qemu-nbd -c /dev/nbd0 'nbd+unix:///sda?socket=/var/tmp/vircpt.207990' -r] && [fdisk -l /dev/nbd0]
-INFO root vircpt - showcmd:  [nbdcopy 'nbd+unix:///sda?socket=/var/tmp/vircpt.207990' -p backup-sda.img]
-INFO root vircpt - showcmd:  [qemu-img create -f qcow2 backup-sda.qcow2 1048576B && nbdcopy -p 'nbd+unix:///sda?socket=/var/tmp/vircpt.207990' -- [ qemu-nbd -f qcow2 backup-sda.qcow2 ]]
+INFO root vircpt - showcmd:  [qemu-nbd -c /dev/nbd0 'nbd+unix:///sda?socket=/var/tmp/vircpt.vm1' -r] && [fdisk -l /dev/nbd0]
+INFO root vircpt - showcmd:  [nbdcopy 'nbd+unix:///sda?socket=/var/tmp/vircpt.vm1' -p backup-sda.img]
+INFO root vircpt - showcmd:  [qemu-img create -f qcow2 backup-sda.qcow2 1048576B && nbdcopy -p 'nbd+unix:///sda?socket=/var/tmp/vircpt.vm1' -- [ qemu-nbd -f qcow2 backup-sda.qcow2 ]]
 INFO root vircpt - main: -----------------------------------
 INFO root vircpt - main: Finished successfully
 ```
@@ -164,14 +164,14 @@ In combination with other tools `vircpt` can be used to create backups.
 ```
 # vircpt -d vm4 export --name backupcheckpoint
 [..]
-INFO root vircpt - showcmd: Socket for exported checkpoint: [/var/tmp/vircpt.12780]
+INFO root vircpt - showcmd: Socket for exported checkpoint: [/var/tmp/vircpt.vm4]
 [..]
 ```
 
 3) backup the first disk (sda) data via `nbdcopy` into a full raw device:
 
 ```
-# nbdcopy 'nbd+unix:///sda?socket=/var/tmp/vircpt.12377' -p backup-sda.img
+# nbdcopy 'nbd+unix:///sda?socket=/var/tmp/vircpt.vm4' -p backup-sda.img
 ```
 
 As alternative, backup the first disk into an thin provisioned qcow2 image
@@ -179,13 +179,13 @@ As alternative, backup the first disk into an thin provisioned qcow2 image
 command output for example):
 
 ```
-# qemu-img create -f qcow2 backup-sda.qcow2 2097152B && nbdcopy -p 'nbd+unix:///sda?socket=/var/tmp/vircpt.12377' -- [ qemu-nbd -f qcow2 backup-sda.qcow2 ]
+# qemu-img create -f qcow2 backup-sda.qcow2 2097152B && nbdcopy -p 'nbd+unix:///sda?socket=/var/tmp/vircpt.vm4' -- [ qemu-nbd -f qcow2 backup-sda.qcow2 ]
 ```
 
 You can also use the nbdcopy option for this:
 
 ```
-# vircpt -d vm4 nbdcopy -f /var/tmp/vircpt.117595 --name backupcheckpoint
+# vircpt -d vm4 nbdcopy --name backupcheckpoint
 [..]
 # ls -alrht backup*
 -rw-r--r-- 1 abi abi 448K Oct 17 23:01 backup-sda.qcow2
@@ -208,14 +208,14 @@ less disk space than a complete virtual machine clone.
 ```
 # vircpt -d vm4 export --name bootme
 [..]
-INFO root vircpt - showcmd: Socket for exported checkpoint: [/var/tmp/vircpt.12780]
+INFO root vircpt - showcmd: Socket for exported checkpoint: [/var/tmp/vircpt.vm4]
 [..]
 ```
 
 1) Map the checkpoint to an qcow overlay image:
 
 ```
-# qemu-img create -F raw -b nbd+unix:///sda?socket=/var/tmp/vircpt.12780 -f qcow2 /tmp/image_sda.qcow2
+# qemu-img create -F raw -b nbd+unix:///sda?socket=/var/tmp/vircpt.vm4 -f qcow2 /tmp/image_sda.qcow2
 ```
 
 2) Boot the image using qemu (or as alternative, create a new libvirt virtual
