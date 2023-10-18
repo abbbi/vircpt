@@ -66,6 +66,17 @@ def refreshDiskList(args, virtClient, domObj):
     return virtClient.getDomainDisksFromCheckpoint(cpt.getXMLDesc())
 
 
+def getDisks(args, vmConfig, virtClient, domObj):
+    """Parse disks as configured in virtual machine config"""
+    diskList = virtClient.getDomainDisks(args, vmConfig)
+    for disk in diskList:
+        try:
+            disk.size = domObj.blockInfo(disk.target)[0]
+        except libvirtError as e:
+            logging.warning("Unable to get disk size: [%s]", e)
+    return diskList
+
+
 def showcmd(args, domObj, diskList):
     """Show useful commands"""
     logging.info("Socket for exported checkpoint: [%s]", args.socketfile)
@@ -257,12 +268,7 @@ def main() -> None:
 
     if args.command in ["export", "create"]:
         vmConfig = virtClient.getDomainConfig(domObj)
-        diskList = virtClient.getDomainDisks(args, vmConfig)
-        for disk in diskList:
-            try:
-                disk.size = domObj.blockInfo(disk.target)[0]
-            except libvirtError as e:
-                logging.warning("Unable to get disk size: [%s]", e)
+        diskList = getDisks(args, vmConfig, virtClient, domObj)
 
     if args.command in ["nbdinfo", "nbdcopy", "nbdmap", "overlay"]:
         sockpath = f"/var/tmp/vircpt.{args.domain}.*"
