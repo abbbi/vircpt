@@ -131,7 +131,7 @@ def _createExportXml(args: Namespace, domObj: libvirt.virDomain, diskList) -> st
         dE = ElementTree.SubElement(
             disks,
             "disk",
-            {"name": disk.target, "exportbitmap": parent, "incremental": parent},
+            {"name": disk.target, "exportbitmap": args.name, "incremental": parent},
         )
         ElementTree.SubElement(dE, "scratch", {"file": f"{scratchFile}"})
 

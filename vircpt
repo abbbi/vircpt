@@ -371,9 +371,6 @@ def main() -> None:
 
     if args.command == "nbdmap":
         diskList = refreshDiskList(args, virtClient, domObj)
-        bitmap = checkpoint.getParent(args, domObj)
-        if bitmap == args.name:
-            bitmap = args.name
         logging.info("Checkpoint/bitmap mapping:")
         for disk in diskList:
             logging.info("Disk: [%s]", disk.target)
@@ -381,7 +378,7 @@ def main() -> None:
                 [
                     "nbdinfo",
                     f"nbd+unix:///{disk.target}?socket={args.socketfile}",
-                    f"--map=qemu:dirty-bitmap:{bitmap}",
+                    f"--map=qemu:dirty-bitmap:{args.name}",
                     "--json",
                 ]
             )
