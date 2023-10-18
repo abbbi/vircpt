@@ -15,10 +15,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-import os
 import sys
 import logging
 import argparse
+import glob
 from getpass import getuser
 from subprocess import CalledProcessError
 import rich
@@ -121,11 +121,11 @@ def main() -> None:
             "   # export checkpoint via NBD accessible via unix socket:\n"
             "\t%(prog)s -d vm export --name mycpt\n"
             "   # show export info:\n"
-            "\t%(prog)s -d vm nbdinfo -f /var/tmp/vircpt.109298\n"
+            "\t%(prog)s -d vm nbdinfo\n"
             "   # show bitmap mapping:\n"
-            "\t%(prog)s -d vm nbdmap --name TEST -f /var/tmp/vircpt.120380\n"
+            "\t%(prog)s -d vm nbdmap\n"
             "   # create full backup using nbdcopy:\n"
-            "\t%(prog)s -d vm nbdcopy -f /var/tmp/vircpt.120380 --name mycpt\n"
+            "\t%(prog)s -d vm nbdcopy\n"
             "   # release export:\n"
             "\t%(prog)s -d vm release\n"
         ),
@@ -212,25 +212,11 @@ def main() -> None:
         "--showinfo", help="Show NBD export info too.", action="store_true"
     )
     sub_parsers.add_parser("nbdinfo", help="Show Export info")
-    parser_nbdmap = sub_parsers.add_parser(
-        "nbdmap", help="Show checkpoint/bitmap extent info"
-    )
-    parser_nbdmap.add_argument(
-        "--name", type=str, help="Name of the checkpoint", required=True
-    )
-    parser_nbdcopy = sub_parsers.add_parser(
-        "nbdcopy", help="Copy data to qcow file using nbdcopy"
-    )
-    parser_nbdcopy.add_argument(
-        "--name", type=str, help="Name of the checkpoint", required=True
-    )
+    sub_parsers.add_parser("nbdcopy", help="Copy data to qcow file using nbdcopy")
+    sub_parsers.add_parser("nbdmap", help="Show NDB export mapping information.")
     sub_parsers.add_parser("release", help="Stop exporting.")
 
     args = lib.argparse(parser)
-
-    args.socketfile = os.environ.get("SOCKET")
-    if args.socketfile is None:
-        args.socketfile = f"/var/tmp/vircpt.{args.domain}"
 
     counter = logCount()  # pylint: disable=unreachable
     lib.configLogger(args, counter)
@@ -260,6 +246,12 @@ def main() -> None:
             disk.size = domObj.blockInfo(disk.target)[0]
         except libvirtError as e:
             logging.warning("Unable to get disk size: [%s]", e)
+
+    if not args.command in ["release", "export", "create", "delete", "list"]:
+        args.name = glob.glob(f"/var/tmp/vircpt.{args.domain}.*")[0].split(".")[-1]
+
+    if not args.command == "release":
+        args.socketfile = f"/var/tmp/vircpt.{args.domain}.{args.name}"
 
     freezed = False
     if args.command == "create":
