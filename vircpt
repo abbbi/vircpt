@@ -221,9 +221,11 @@ def main() -> None:
     )
     sub_parsers.add_parser("nbdinfo", help="Show Export info")
     sub_parsers.add_parser("nbdcopy", help="Copy data to qcow file using nbdcopy")
-    sub_parsers.add_parser("nbdmap", help="Show NDB export mapping information.")
-    sub_parsers.add_parser("overlay", help="Show NDB export mapping information.")
-    sub_parsers.add_parser("release", help="Stop exporting.")
+    sub_parsers.add_parser("nbdmap", help="Show NDB export mapping information")
+    sub_parsers.add_parser(
+        "overlay", help="Create qcow overlay images with NBD server backing"
+    )
+    sub_parsers.add_parser("release", help="Stop exporting blockjob")
 
     args = lib.argparse(parser)
 
