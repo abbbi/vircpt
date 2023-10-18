@@ -24,5 +24,5 @@ log = logging.getLogger(__name__)
 
 def run(cmdLine: List[str]):
     """Execute passed command"""
-    log.debug("CMD: %s", " ".join(cmdLine))
+    log.debug("CMD: [%s]", " ".join(cmdLine))
     return subprocess.run(cmdLine, capture_output=True, text=True, check=True)
