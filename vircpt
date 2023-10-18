@@ -60,7 +60,7 @@ def execute(cmd):
     rich.print_json(proc.stdout)
 
 
-def showcmd(args, diskList):
+def showcmd(args, domObj, diskList):
     """Show useful commands"""
     logging.info("Socket for exported checkpoint: [%s]", args.socketfile)
     logging.info("-----------------------------------")
@@ -69,6 +69,7 @@ def showcmd(args, diskList):
     logging.info("[nbdinfo 'nbd+unix:///?socket=%s' --list]", args.socketfile)
     cnt = 0
     for disk in diskList:
+        disk.size = domObj.blockInfo(disk.target)[0]
         logging.info("Disk: %s", disk.target)
         logging.info(
             " [qemu-img create -F raw "
@@ -319,7 +320,7 @@ def main() -> None:
                 cpt = checkpoint.exists(domObj, args.name)
                 diskList = virtClient.getDomainDisksFromCheckpoint(cpt.getXMLDesc())
                 checkpoint.export(args, domObj, diskList)
-                showcmd(args, diskList)
+                showcmd(args, domObj, diskList)
             except libvirtError as e:
                 logging.error("Failed to export checkpoint: [%s]", e)
 
