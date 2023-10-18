@@ -8,6 +8,7 @@
   - [Creating an checkpoint](#creating-an-checkpoint)
   - [List checkpoints](#list-checkpoints)
   - [Start NBD export for a specific checkpoint](#start-nbd-export-for-a-specific-checkpoint)
+  - [Show export info](#show-export-info)
   - [Query export information for a specific checkpoint](#query-export-information-for-a-specific-checkpoint)
   - [Release an export](#release-an-export)
   - [Removing checkpoints](#removing-checkpoints)
@@ -105,13 +106,31 @@ NBD socket endpoint, such as:
 Its also possible to show detailed information about the NBD export
 via `--showinfo` option.
 
+## Show export info
+
+```
+# vircpt -d vm4 nbdinfo
+INFO lib common - printVersion: Version: 0.1 Arguments: ./vircpt -d vm4 nbdinfo
+INFO root vircpt - main: Libvirt library version: [9000000]
+WARNING root disktype - Raw: Excluding unsupported raw disk [sdb].
+{
+  "protocol": "newstyle-fixed",
+  "TLS": false,
+  "structured": true,
+  "exports": [
+    {                                                                                          x
+      "export-name": "sda",
+      "uri": "nbd+unix:///sda?socket=/var/tmp/vircpt.vm4.TEST",
+[..]
+```
+
 ## Query export information for a specific checkpoint
 
 In order to show the bitmap block mappings use:
 
 ```
-# vircpt -d vm4 nbdmap --name TEST -f /var/tmp/vircpt.115025
-INFO lib common - printVersion: Version: 0.1 Arguments: ./vircpt -d vm4 nbdmap --name TEST -f /var/tmp/vircpt.115025
+# vircpt -d vm4 nbdmap
+INFO lib common - printVersion: Version: 0.1 Arguments: ./vircpt -d vm4 nbdmap
 INFO root vircpt - main: Libvirt library version: [9000000]
 WARNING root disktype - Raw: Excluding unsupported raw disk [sdb].
 INFO root vircpt - main: Checkpoint/bitmap mapping:
