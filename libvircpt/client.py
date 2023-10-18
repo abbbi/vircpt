@@ -125,10 +125,7 @@ class client:
             log.debug(
                 "Login information specified, connect libvirtd using openAuth function."
             )
-            if (
-                not self._reqAuth(args.uri)
-                and (not args.user or not args.password)
-            ):
+            if not self._reqAuth(args.uri) and (not args.user or not args.password):
                 raise connectionFailed(
                     "Username (--user) and password (--password) required."
                 )
