@@ -94,7 +94,8 @@ def show(domObj: libvirt.virDomain):
 
 
 def getParent(args, domObj):
-    """Refresh list about disks included in checkpoint"""
+    """Check if current checkpoint has an parent, if so this checkpoint
+    is referenced as incremental entry point for the export."""
     parent = args.name
     try:
         return exists(domObj, args.name).getParent().getName()
@@ -105,7 +106,9 @@ def getParent(args, domObj):
 
 
 def _createExportXml(args: Namespace, domObj: libvirt.virDomain, diskList) -> str:
-    """Create xml required for exporting checkpoint"""
+    """Create xml required for exporting checkpoint. If an parent checkpoint
+    exists, add the required incremental flags to the backupBegin call so the
+    exported bitmap contains the changes to the last checkpoint."""
     parent = getParent(args, domObj)
     top = ElementTree.Element("domainbackup", {"mode": "pull"})
     ElementTree.SubElement(
