@@ -187,21 +187,7 @@ INFO root vircpt - showcmd: Socket for exported checkpoint: [/var/tmp/vircpt.vm4
 [..]
 ```
 
-3) backup the first disk (sda) data via `nbdcopy` into a full raw device:
-
-```
-# nbdcopy 'nbd+unix:///sda?socket=/var/tmp/vircpt.vm4' -p backup-sda.img
-```
-
-As alternative, backup the first disk into an thin provisioned qcow2 image
-(size of the image depends on your setup, see the export
-command output for example):
-
-```
-# qemu-img create -f qcow2 backup-sda.qcow2 2097152B && nbdcopy -p 'nbd+unix:///sda?socket=/var/tmp/vircpt.vm4' -- [ qemu-nbd -f qcow2 backup-sda.qcow2 ]
-```
-
-You can also use the nbdcopy option for this:
+3) create an full backup using the nbdcopy option:
 
 ```
 # vircpt -d vm4 nbdcopy
@@ -227,21 +213,27 @@ less disk space than a complete virtual machine clone.
 ```
 # vircpt -d vm4 export --name bootme
 [..]
-INFO root vircpt - showcmd: Socket for exported checkpoint: [/var/tmp/vircpt.vm4]
+INFO root vircpt - showcmd: Socket for exported checkpoint: [/var/tmp/vircpt.vm4.bootme]
 [..]
 ```
 
 1) Map the checkpoint to an qcow overlay image:
 
 ```
-# qemu-img create -F raw -b nbd+unix:///sda?socket=/var/tmp/vircpt.vm4 -f qcow2 /tmp/image_sda.qcow2
+# vircpt -d vm4 overlay
+INFO lib common - printVersion: Version: 0.1 Arguments: ./vircpt -d vm4 overlay
+INFO root vircpt - main: Libvirt library version: [9000000]
+WARNING root disktype - Raw: Excluding unsupported raw disk [sdb].
+INFO root vircpt - main: Create overlay images
+INFO root vircpt - main: Disk: [sda]: [overlay_sda.qcow2]
+INFO root vircpt - main: Finished successfully
 ```
 
 2) Boot the image using qemu (or as alternative, create a new libvirt virtual
    machine config and attach the created overlay image):
 
 ```
-# qemu-system-<arch> -hda /tmp/image_sda.qcow2 -m 2500 --enable-kvm
+# qemu-system-<arch> -hda overlay_sda.qcow2 -m 2500 --enable-kvm
 ```
 
 ## Agentless clamav or other anti virus engines

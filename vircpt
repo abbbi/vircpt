@@ -48,8 +48,13 @@ def execute(cmd):
         logging.error("%s", e)
         return
 
+    if "-q" in cmd:
+        return
+
     if "--json" not in cmd:
-        print(proc.stdout)
+        if proc.stdout == "":
+            return
+        print(proc.stdout.strip())
         return
 
     rich.print_json(proc.stdout)
@@ -126,6 +131,8 @@ def main() -> None:
             "\t%(prog)s -d vm nbdmap\n"
             "   # create full backup using nbdcopy:\n"
             "\t%(prog)s -d vm nbdcopy\n"
+            "   # create overlay images:\n"
+            "\t%(prog)s -d vm overlay\n"
             "   # release export:\n"
             "\t%(prog)s -d vm release\n"
         ),
@@ -214,6 +221,7 @@ def main() -> None:
     sub_parsers.add_parser("nbdinfo", help="Show Export info")
     sub_parsers.add_parser("nbdcopy", help="Copy data to qcow file using nbdcopy")
     sub_parsers.add_parser("nbdmap", help="Show NDB export mapping information.")
+    sub_parsers.add_parser("overlay", help="Show NDB export mapping information.")
     sub_parsers.add_parser("release", help="Stop exporting.")
 
     args = lib.argparse(parser)
@@ -247,7 +255,7 @@ def main() -> None:
         except libvirtError as e:
             logging.warning("Unable to get disk size: [%s]", e)
 
-    if args.command in ["nbdinfo", "nbdcopy", "nbdmap"]:
+    if args.command in ["nbdinfo", "nbdcopy", "nbdmap", "overlay"]:
         sockpath = f"/var/tmp/vircpt.{args.domain}.*"
         try:
             args.name = glob.glob(sockpath)[0].split(".")[-1]
@@ -349,14 +357,16 @@ def main() -> None:
         diskList = virtClient.getDomainDisksFromCheckpoint(cpt.getXMLDesc())
         for disk in diskList:
             disk.size = domObj.blockInfo(disk.target)[0]
-            logging.info("Disk: [%s]", disk.target)
+            file = f"backup-{disk.target}.qcow2"
+            logging.info("Disk: [%s]: [%s]", disk.target, file)
             execute(
                 [
                     "qemu-img",
                     "create",
+                    "-q",
                     "-f",
                     "qcow2",
-                    f"backup-{disk.target}.qcow2",
+                    file,
                     f"{disk.size}B",
                 ]
             )
@@ -369,8 +379,29 @@ def main() -> None:
                     "qemu-nbd",
                     "-f",
                     "qcow2",
-                    f"backup-{disk.target}.qcow2",
+                    file,
                     "]",
+                ]
+            )
+
+    if args.command == "overlay":
+        logging.info("Create overlay images")
+        cpt = checkpoint.exists(domObj, args.name)
+        diskList = virtClient.getDomainDisksFromCheckpoint(cpt.getXMLDesc())
+        for disk in diskList:
+            file = f"overlay_{disk.target}.qcow2"
+            logging.info("Disk: [%s]: [%s]", disk.target, file)
+            execute(
+                [
+                    "qemu-img",
+                    "create",
+                    "-q",
+                    "-F",
+                    "raw",
+                    "-b" f"nbd+unix:///{disk.target}?socket={args.socketfile}",
+                    "-f",
+                    "qcow2",
+                    file,
                 ]
             )
 
