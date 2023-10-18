@@ -345,10 +345,16 @@ def main() -> None:
         else:
             try:
                 diskList = refreshDiskList(args, virtClient, domObj)
+                freezed = fs.freeze(domObj)
                 checkpoint.export(args, domObj, diskList)
+                if freezed:
+                    fs.thaw(domObj)
                 showcmd(args, domObj, diskList)
             except libvirtError as e:
                 logging.error("Failed to export checkpoint: [%s]", e)
+            finally:
+                if freezed:
+                    fs.thaw(domObj)
 
         if args.showinfo:
             args.command = "nbdinfo"
