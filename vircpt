@@ -248,7 +248,15 @@ def main() -> None:
     )
     sub_parsers.add_parser("nbdinfo", help="Show Export info")
     sub_parsers.add_parser("nbdcopy", help="Copy data to qcow file using nbdcopy")
-    sub_parsers.add_parser("nbdmap", help="Show NDB export mapping information")
+    nbdmap = sub_parsers.add_parser(
+        "nbdmap", help="Show NDB export mapping information"
+    )
+    nbdmap.add_argument(
+        "--base",
+        help="Show base:allocation mapping instead of bitmap.",
+        action="store_true",
+        required=False,
+    )
     sub_parsers.add_parser(
         "overlay", help="Create qcow overlay images with NBD server backing"
     )
@@ -370,6 +378,9 @@ def main() -> None:
         )
 
     if args.command == "nbdmap":
+        bitmap = f"qemu:dirty-bitmap:{args.name}"
+        if args.base:
+            bitmap = "base:allocation"
         diskList = refreshDiskList(args, virtClient, domObj)
         logging.info("Checkpoint/bitmap mapping:")
         for disk in diskList:
@@ -378,7 +389,7 @@ def main() -> None:
                 [
                     "nbdinfo",
                     f"nbd+unix:///{disk.target}?socket={args.socketfile}",
-                    f"--map=qemu:dirty-bitmap:{args.name}",
+                    f"--map={bitmap}",
                     "--json",
                 ]
             )
