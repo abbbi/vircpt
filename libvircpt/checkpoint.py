@@ -43,13 +43,18 @@ def getXml(cptObj: libvirt.virDomainCheckpoint) -> str:
         return cptObj.getXMLDesc()
 
 
-def delete(cptObj: libvirt.virDomainCheckpoint) -> bool:
+def delete(args: Namespace, cptObj: libvirt.virDomainCheckpoint) -> bool:
     """Delete checkpoint"""
     checkpointName = cptObj.getName()
-    log.debug("Attempt to remove checkpoint: [%s]", checkpointName)
+
+    flags = 0
+    if args.metadata is True:
+        flags = libvirt.VIR_DOMAIN_CHECKPOINT_DELETE_METADATA_ONLY
+        log.debug("Attempt to remove checkpoint metadata: [%s]", checkpointName)
+    else:
+        log.debug("Attempt to remove checkpoint: [%s]", checkpointName)
     try:
-        cptObj.delete()
-        log.debug("Removed checkpoint: [%s]", checkpointName)
+        cptObj.delete(flags)
         return True
     except libvirt.libvirtError as errmsg:
         log.error("Error during checkpoint removal: [%s]", errmsg)
@@ -93,7 +98,7 @@ def show(domObj: libvirt.virDomain):
         logging.info(" + %s", cpt.getName())
 
 
-def getParent(args, domObj):
+def getParent(args: Namespace, domObj):
     """Check if current checkpoint has an parent, if so this checkpoint
     is referenced as incremental entry point for the export."""
     parent = args.name

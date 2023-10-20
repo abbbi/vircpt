@@ -238,6 +238,12 @@ def main() -> None:
     parser_delete.add_argument(
         "--name", type=str, help="Name of the checkpoint", required=True
     )
+    parser_delete.add_argument(
+        "--metadata",
+        help="Delete checkpoint metadata only",
+        action="store_true",
+        required=False,
+    )
     sub_parsers.add_parser("list", help="List checkpoints")
     parser_export = sub_parsers.add_parser("export", help="Export checkpoints via NBD")
     parser_export.add_argument(
@@ -325,7 +331,7 @@ def main() -> None:
     if args.command == "delete":
         try:
             cpt = checkpoint.exists(domObj, args.name)
-            checkpoint.delete(cpt)
+            checkpoint.delete(args, cpt)
             logging.info("Removed checkpoint: [%s]", args.name)
         except libvirtError as e:
             logging.error("Failed to remove checkpoint: [%s]", e)
